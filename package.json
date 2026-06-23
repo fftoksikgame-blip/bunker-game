@@ -1,0 +1,12 @@
+{
+  "name": "bunker-7",
+  "version": "7.0.0",
+  "description": "7 карт с блокнотом",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
