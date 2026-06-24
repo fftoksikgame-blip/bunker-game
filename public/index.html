@@ -66,17 +66,34 @@
     .card.hidden-card { border-color:#555; opacity:0.5; }
     .card.hidden-card .card-value { color:#889; }
 
-    /* ИНФО-КАРТОЧКИ (компактные) */
-    .info-row {
-      display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; margin:6px 0 12px 0;
+    /* ДВЕ КОЛОНКИ ДЛЯ ИНФО */
+    .info-panels {
+      display:flex; flex-wrap:wrap; gap:16px; justify-content:center;
+      width:100%; margin:6px 0 12px 0;
+    }
+    .info-panel {
+      background:#101818; border:1px solid #2a3a3a; border-radius:16px;
+      padding:12px 18px; flex:1 1 280px; max-width:400px; min-width:200px;
+    }
+    .info-panel h4 {
+      color:#f5c542; font-weight:400; font-size:0.9rem;
+      letter-spacing:0.5px; margin-bottom:6px;
+      border-bottom:1px solid #1a2a2a; padding-bottom:4px;
+    }
+    .info-panel .chip-container {
+      display:flex; flex-wrap:wrap; gap:6px; align-items:center;
     }
     .info-chip {
-      background:#101818; border:1px solid #2a3a3a; border-radius:30px;
-      padding:6px 18px; display:inline-flex; align-items:center; gap:8px;
+      background:#0a1414; border:1px solid #2a3a3a; border-radius:30px;
+      padding:4px 14px; display:inline-flex; align-items:center; gap:6px;
       font-size:0.85rem; color:#e8e8e8;
     }
     .info-chip .label { color:#f5c542; font-weight:600; }
     .info-chip .value { color:#f0f0f0; font-weight:500; }
+    .info-empty {
+      color:#556; font-style:italic; font-size:0.85rem;
+      padding:4px 0;
+    }
 
     /* БЛОКНОТ */
     .notebook {
@@ -150,7 +167,7 @@
       .card { flex:1 1 100%; max-width:100%; min-height:80px; }
       .card .card-value { font-size:0.9rem; }
       .manual-add { flex-direction:column; align-items:stretch; }
-      .info-chip { font-size:0.75rem; padding:4px 12px; }
+      .info-panel { flex:1 1 100%; max-width:100%; }
     }
   </style>
 </head>
@@ -169,8 +186,21 @@
     <button class="btn btn-outline" id="bunkerBtn">📦 Бункер</button>
   </div>
 
-  <!-- КОМПАКТНЫЕ ИНФО-КАРТОЧКИ -->
-  <div class="info-row" id="infoRow"></div>
+  <!-- ДВЕ ПАНЕЛИ: КАТАСТРОФА И БУНКЕР -->
+  <div class="info-panels">
+    <div class="info-panel" id="catastrophePanel">
+      <h4>🌪️ Катастрофа / Эпидемия</h4>
+      <div class="chip-container" id="catastropheContent">
+        <span class="info-empty">Не выбрана</span>
+      </div>
+    </div>
+    <div class="info-panel" id="bunkerPanel">
+      <h4>📦 Содержимое бункера</h4>
+      <div class="chip-container" id="bunkerContent">
+        <span class="info-empty">Не загружено</span>
+      </div>
+    </div>
+  </div>
 
   <!-- КАРТЫ -->
   <div class="cards-grid" id="cardsContainer"></div>
@@ -228,7 +258,8 @@
     const restartBtn = document.getElementById('restartBtn');
     const catastropheBtn = document.getElementById('catastropheBtn');
     const bunkerBtn = document.getElementById('bunkerBtn');
-    const infoRow = document.getElementById('infoRow');
+    const catastropheContent = document.getElementById('catastropheContent');
+    const bunkerContent = document.getElementById('bunkerContent');
 
     const playerTabs = document.getElementById('playerTabs');
     const notebookEntries = document.getElementById('notebookEntries');
@@ -287,9 +318,10 @@
       setPlayerEntries(playerName, []);
     }
 
-    // --- Очистка инфо-ряда ---
-    function clearInfoRow() {
-      infoRow.innerHTML = '';
+    // --- Очистка панелей ---
+    function clearPanels() {
+      catastropheContent.innerHTML = `<span class="info-empty">Не выбрана</span>`;
+      bunkerContent.innerHTML = `<span class="info-empty">Не загружено</span>`;
     }
 
     // --- Рендер карт ---
@@ -431,7 +463,7 @@
       renderNotebook(); saveState();
     }
 
-    // --- Загрузка карт с сервера (с очисткой инфо) ---
+    // --- Загрузка карт с сервера (с очисткой панелей) ---
     async function fetchCards() {
       try {
         const res = await fetch('/api/start');
@@ -439,7 +471,7 @@
         const raw = await res.json();
         currentCards = raw.map(c => ({ title: c.title, value: c.value, revealed: false, hidden: false }));
         renderCards();
-        clearInfoRow(); // Очищаем катастрофу/бункер
+        clearPanels(); // Очищаем обе панели
         startBtn.classList.add('hidden');
         restartBtn.classList.remove('hidden');
         saveState();
@@ -449,11 +481,11 @@
       }
     }
 
-    // --- Сброс игры (очищает всё: карты, инфо, но не блокнот) ---
+    // --- Сброс игры (очищает всё: карты, панели, но не блокнот) ---
     function resetGame() {
       currentCards = [];
       container.innerHTML = '';
-      clearInfoRow();
+      clearPanels();
       restartBtn.classList.add('hidden');
       startBtn.classList.remove('hidden');
       saveState();
@@ -467,19 +499,21 @@
       renderNotebook(); saveState();
     }
 
-    // --- Рандомная эпидемия (компактно) ---
+    // --- Рандомная эпидемия (в левую панель) ---
     async function fetchCatastrophe() {
       try {
         const res = await fetch('/api/catastrophe');
         if (!res.ok) throw new Error('Ошибка');
         const data = await res.json();
-        infoRow.innerHTML = `
-          <div class="info-chip"><span class="label">🌪️ Катастрофа:</span> <span class="value">${data.catastrophe}</span></div>
+        catastropheContent.innerHTML = `
+          <div class="info-chip"><span class="label">🌪️</span> <span class="value">${data.catastrophe}</span></div>
         `;
-      } catch(e) { infoRow.innerHTML = '<div class="info-chip"><span class="label">⚠️ Ошибка</span></div>'; }
+      } catch(e) {
+        catastropheContent.innerHTML = `<span class="info-empty">⚠️ Ошибка</span>`;
+      }
     }
 
-    // --- Содержимое бункера (компактно) ---
+    // --- Содержимое бункера (в правую панель) ---
     async function fetchBunker() {
       try {
         const res = await fetch('/api/bunker');
@@ -487,10 +521,12 @@
         const data = await res.json();
         let chips = '';
         data.forEach(item => {
-          chips += `<span class="info-chip"><span class="label">📦 ${item.item}:</span> <span class="value">${item.amount}</span></span>`;
+          chips += `<div class="info-chip"><span class="label">${item.item}:</span> <span class="value">${item.amount}</span></div>`;
         });
-        infoRow.innerHTML = chips;
-      } catch(e) { infoRow.innerHTML = '<div class="info-chip"><span class="label">⚠️ Ошибка</span></div>'; }
+        bunkerContent.innerHTML = chips || `<span class="info-empty">Пусто</span>`;
+      } catch(e) {
+        bunkerContent.innerHTML = `<span class="info-empty">⚠️ Ошибка</span>`;
+      }
     }
 
     // --- Восстановление состояния ---
