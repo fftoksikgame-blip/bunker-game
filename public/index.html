@@ -152,6 +152,10 @@
     .notebook-entry .entry-value { color:#e8e8e8; flex:1; margin:0 8px; cursor:pointer; }
     .notebook-entry .entry-actions button { background:none; border:none; color:#667; cursor:pointer; font-size:0.7rem; }
     .notebook-entry .entry-actions button:hover { color:#ff6666; }
+    .notebook-entry .entry-count {
+      background:#1a2a2a; padding:0 10px; border-radius:20px;
+      font-size:0.7rem; color:#aab; margin-left:6px;
+    }
 
     .notebook-empty { color:#556; font-style:italic; text-align:center; padding:10px 0; font-size:0.9rem; }
 
@@ -304,25 +308,36 @@
       notebook[playerName] = entries;
       saveNotebook(notebook);
     }
+
+    // --- СТАКАНИЕ (группировка) ---
     function addEntryToPlayer(playerName, title, value) {
       const entries = getPlayerEntries(playerName);
-      entries.push({ title, value });
+      // Ищем существующую запись с таким же title и value
+      const existing = entries.find(e => e.title === title && e.value === value);
+      if (existing) {
+        existing.count = (existing.count || 1) + 1;
+      } else {
+        entries.push({ title, value, count: 1 });
+      }
       setPlayerEntries(playerName, entries);
     }
+
     function deleteEntryFromPlayer(playerName, index) {
       const entries = getPlayerEntries(playerName);
-      entries.splice(index, 1);
+      if (entries[index].count > 1) {
+        entries[index].count -= 1;
+      } else {
+        entries.splice(index, 1);
+      }
       setPlayerEntries(playerName, entries);
     }
+
     function clearPlayerEntries(playerName) {
       setPlayerEntries(playerName, []);
     }
 
-    // --- Очистка панелей ---
-    function clearPanels() {
-      catastropheContent.innerHTML = `<span class="info-empty">Не выбрана</span>`;
-      bunkerContent.innerHTML = `<span class="info-empty">Не загружено</span>`;
-    }
+    // --- Очистка панелей (только по кнопкам) ---
+    // Оставляем возможность очистить вручную, но не автоматически
 
     // --- Рендер карт ---
     function renderCards() {
@@ -355,19 +370,20 @@
       });
     }
 
-    // --- Рендер блокнота ---
+    // --- Рендер блокнота (с учётом стакания) ---
     function renderNotebook() {
       if (!currentPlayer) { notebookEntries.innerHTML = `<div class="notebook-empty">Выберите игрока</div>`; return; }
       const entries = getPlayerEntries(currentPlayer);
       if (entries.length === 0) { notebookEntries.innerHTML = `<div class="notebook-empty">У игрока "${currentPlayer}" пока нет карт</div>`; return; }
       let html = '';
       entries.forEach((e, index) => {
+        const countDisplay = e.count > 1 ? `<span class="entry-count">x${e.count}</span>` : '';
         html += `
           <div class="notebook-entry" data-index="${index}">
             <span class="entry-label">${e.title}:</span>
-            <span class="entry-value" data-index="${index}">${e.value}</span>
+            <span class="entry-value" data-index="${index}">${e.value} ${countDisplay}</span>
             <div class="entry-actions">
-              <button class="delete-entry" data-index="${index}" title="Удалить">✖</button>
+              <button class="delete-entry" data-index="${index}" title="Удалить одну">✖</button>
             </div>
           </div>
         `;
@@ -377,14 +393,17 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const index = parseInt(btn.dataset.index);
-          if (confirm(`Удалить эту карту?`)) { deleteEntryFromPlayer(currentPlayer, index); renderNotebook(); saveState(); }
+          deleteEntryFromPlayer(currentPlayer, index);
+          renderNotebook();
+          saveState();
         });
       });
       document.querySelectorAll('.entry-value').forEach(el => {
         el.addEventListener('click', function(e) {
           e.stopPropagation();
           const index = parseInt(this.dataset.index);
-          const currentText = this.textContent;
+          const entries = getPlayerEntries(currentPlayer);
+          const currentText = entries[index].value;
           const input = document.createElement('input');
           input.type = 'text';
           input.value = currentText;
@@ -452,7 +471,7 @@
       renderTabs(); renderNotebook(); saveState();
     }
 
-    // --- Ручное добавление карты ---
+    // --- Ручное добавление карты (с поддержкой стакания) ---
     function manualAddCard() {
       if (!currentPlayer) { alert('Сначала выберите игрока'); return; }
       const category = manualCategory.value;
@@ -463,7 +482,7 @@
       renderNotebook(); saveState();
     }
 
-    // --- Загрузка карт с сервера (с очисткой панелей) ---
+    // --- Загрузка карт с сервера (НЕ очищаем эпидемию и бункер) ---
     async function fetchCards() {
       try {
         const res = await fetch('/api/start');
@@ -471,7 +490,6 @@
         const raw = await res.json();
         currentCards = raw.map(c => ({ title: c.title, value: c.value, revealed: false, hidden: false }));
         renderCards();
-        clearPanels(); // Очищаем обе панели
         startBtn.classList.add('hidden');
         restartBtn.classList.remove('hidden');
         saveState();
@@ -481,11 +499,10 @@
       }
     }
 
-    // --- Сброс игры (очищает всё: карты, панели, но не блокнот) ---
+    // --- Сброс игры (НЕ очищаем эпидемию и бункер) ---
     function resetGame() {
       currentCards = [];
       container.innerHTML = '';
-      clearPanels();
       restartBtn.classList.add('hidden');
       startBtn.classList.remove('hidden');
       saveState();
