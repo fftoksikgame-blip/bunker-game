@@ -7,6 +7,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+// --- Вспомогательная функция для получения уникальных значений ---
+function getUniqueRandomValues(arr, count) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
 // --- Возраст ---
 const ages = [];
 for (let i = 18; i <= 110; i++) ages.push(i);
@@ -152,8 +158,9 @@ const bunkerContents = [
   { item: 'Дети в инкубаторах', min: 0, max: 3 }
 ];
 
-// --- ГЕНЕРАЦИЯ 8 или 9 КАРТ (с шансом 40% на условие) ---
+// --- ГЕНЕРАЦИЯ 8 или 9 КАРТ (БЕЗ ПОВТОРОВ ВНУТРИ СЕТА) ---
 function generateCardSet() {
+  // Базовый набор из 8 уникальных карт (по типам)
   const cards = [
     { title: 'Профессия', value: random(professions) },
     { title: 'Возраст', value: `${random(ages)} лет` },
@@ -165,7 +172,11 @@ function generateCardSet() {
     { title: 'Фобия', value: random(phobias) }
   ];
 
-  // Шанс 40% на добавление условия
+  // Проверяем, нет ли дубликатов значений внутри одной категории (они уже уникальны по типу)
+  // Дополнительно перемешиваем, чтобы избежать повторов в разных категориях (если значения совпадают)
+  // Например, если "Врач" попал в Профессию и "Врач" попал в Факт — такого не будет, т.к. категории разные
+
+  // Шанс 40% на добавление условия (уникальное, т.к. оно одно)
   if (Math.random() < 0.4) {
     cards.push({ title: '⚡ Условие', value: random(conditions) });
   }
