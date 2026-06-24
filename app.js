@@ -152,9 +152,9 @@ const bunkerContents = [
   { item: 'Дети в инкубаторах', min: 0, max: 3 }
 ];
 
-// --- ГЕНЕРАЦИЯ 9 КАРТ ---
+// --- ГЕНЕРАЦИЯ 8 или 9 КАРТ (с шансом 40% на условие) ---
 function generateCardSet() {
-  return [
+  const cards = [
     { title: 'Профессия', value: random(professions) },
     { title: 'Возраст', value: `${random(ages)} лет` },
     { title: 'Факт', value: random(facts) },
@@ -162,9 +162,15 @@ function generateCardSet() {
     { title: 'Багаж', value: random(baggages) },
     { title: 'Здоровье', value: random(healths) },
     { title: 'Характер', value: random(characters) },
-    { title: 'Фобия', value: random(phobias) },
-    { title: '⚡ Условие', value: random(conditions) }
+    { title: 'Фобия', value: random(phobias) }
   ];
+
+  // Шанс 40% на добавление условия
+  if (Math.random() < 0.4) {
+    cards.push({ title: '⚡ Условие', value: random(conditions) });
+  }
+
+  return cards;
 }
 
 // --- API ---
