@@ -18,21 +18,21 @@
       align-items: center;
     }
     .container { width:100%; max-width:1300px; display:flex; flex-direction:column; align-items:center; }
-    .header { text-align:center; margin-bottom:16px; width:100%; }
+    .header { text-align:center; margin-bottom:20px; width:100%; }
     .header h1 {
-      font-size:2.6rem; font-weight:800; color:#f5c542;
-      text-shadow: 0 0 40px #f5c54233;
+      font-size:2.8rem; font-weight:800; color:#f5c542;
+      text-shadow: 0 0 40px #f5c54233, 0 0 80px #f5c54211;
       letter-spacing:2px;
     }
-    .header .sub { color:#8899aa; font-size:0.8rem; border-top:1px solid #2a3a3a; padding-top:6px; display:inline-block; }
+    .header .sub { color:#8899aa; font-size:0.9rem; border-top:1px solid #2a3a3a; padding-top:8px; display:inline-block; }
 
     .btn-group {
-      display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:16px; width:100%;
+      display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-bottom:20px; width:100%;
     }
     .btn {
       background:#f5c542; border:none; color:#0b0e14; font-weight:700;
-      padding:12px 28px; border-radius:60px; cursor:pointer;
-      transition:0.15s; font-size:1rem; box-shadow:0 0 20px #f5c54244;
+      padding:14px 32px; border-radius:60px; cursor:pointer;
+      transition:0.15s; font-size:1.1rem; box-shadow:0 0 30px #f5c54244;
     }
     .btn:active { transform:scale(0.94); }
     .btn-secondary { background:#1a2a2a; color:#c0d0d0; box-shadow:none; }
@@ -40,117 +40,113 @@
     .btn-outline { background:transparent; border:1px solid #f5c542; color:#f5c542; box-shadow:none; }
     .btn-outline:hover { background:#f5c54222; }
     .btn-danger { background:#6a1a1a; color:#ff8888; box-shadow:none; }
-    .btn-small { font-size:0.75rem; padding:5px 14px; }
+    .btn-small { font-size:0.8rem; padding:6px 16px; }
     .btn-green { background:#1a5a2a; color:#7aff7a; box-shadow:none; }
 
     .hidden { display:none !important; }
 
-    /* КАРТЫ */
     .cards-grid {
-      display:flex; flex-wrap:wrap; justify-content:center; gap:12px;
-      width:100%; margin:12px 0;
+      display:flex; flex-wrap:wrap; justify-content:center; gap:14px;
+      width:100%; margin:16px 0;
     }
     .card {
-      background:#141c1c; border-left:6px solid #f5c542; border-radius:12px;
-      padding:12px 14px; flex:1 1 180px; max-width:220px; min-width:150px;
-      box-shadow:0 6px 20px #00000099; text-align:center;
-      display:flex; flex-direction:column; justify-content:center; min-height:100px;
+      background:#141c1c; border-left:6px solid #f5c542; border-radius:14px;
+      padding:14px 16px; flex:1 1 200px; max-width:250px; min-width:160px;
+      box-shadow:0 8px 30px #00000099; text-align:center;
+      display:flex; flex-direction:column; justify-content:center; min-height:120px;
       cursor:pointer; transition:0.2s; user-select:none;
     }
-    .card:hover { transform:translateY(-3px); border-color:#f5a542; }
-    .card .card-title { font-size:0.55rem; text-transform:uppercase; letter-spacing:1.2px; color:#f5c542; margin-bottom:3px; }
-    .card .card-value { font-size:1rem; font-weight:600; color:#f0f0f0; line-height:1.3; word-break:break-word; }
-    .card .card-status { font-size:0.55rem; color:#667; margin-top:5px; }
+    .card:hover { transform:translateY(-4px); border-color:#f5a542; }
+    .card .card-title { font-size:0.6rem; text-transform:uppercase; letter-spacing:1.5px; color:#f5c542; margin-bottom:4px; }
+    .card .card-value { font-size:1.1rem; font-weight:600; color:#f0f0f0; line-height:1.3; word-break:break-word; }
+    .card .card-status { font-size:0.6rem; color:#667; margin-top:6px; }
     .card.revealed { border-color:#7aff7a; background:#1a2a1a; }
     .card.revealed .card-status { color:#7aff7a; }
     .card.hidden-card { border-color:#555; opacity:0.5; }
     .card.hidden-card .card-value { color:#889; }
 
-    /* ИНФО-КАРТОЧКИ (компактные) */
-    .info-row {
-      display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; margin:6px 0 12px 0;
-    }
-    .info-chip {
-      background:#101818; border:1px solid #2a3a3a; border-radius:30px;
-      padding:6px 18px; display:inline-flex; align-items:center; gap:8px;
-      font-size:0.85rem; color:#e8e8e8;
-    }
-    .info-chip .label { color:#f5c542; font-weight:600; }
-    .info-chip .value { color:#f0f0f0; font-weight:500; }
-
-    /* БЛОКНОТ */
     .notebook {
       background:#101818; border:1px solid #2a3a3a; border-radius:16px;
-      padding:14px 18px; width:100%; max-width:1000px; margin:12px 0;
+      padding:16px 20px; width:100%; max-width:1000px; margin:16px 0;
     }
     .notebook-header {
       display:flex; justify-content:space-between; align-items:center;
-      flex-wrap:wrap; gap:8px; border-bottom:1px solid #2a3a3a;
-      padding-bottom:8px; margin-bottom:10px;
+      flex-wrap:wrap; gap:10px; border-bottom:1px solid #2a3a3a;
+      padding-bottom:10px; margin-bottom:12px;
     }
-    .notebook-header h3 { color:#f5c542; font-weight:400; font-size:1.1rem; letter-spacing:0.5px; }
-    .notebook-header .badge { background:#1a2a2a; padding:3px 14px; border-radius:30px; font-size:0.75rem; color:#aab; }
+    .notebook-header h3 { color:#f5c542; font-weight:400; letter-spacing:1px; }
+    .notebook-header .badge { background:#1a2a2a; padding:4px 16px; border-radius:30px; font-size:0.8rem; color:#aab; }
 
     .player-tabs {
-      display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px;
+      display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;
     }
     .player-tab {
-      background:#0a1414; border:1px solid #2a3a3a; padding:4px 14px;
-      border-radius:30px; cursor:pointer; font-size:0.8rem;
+      background:#0a1414; border:1px solid #2a3a3a; padding:6px 16px;
+      border-radius:30px; cursor:pointer; font-size:0.85rem;
       transition:0.1s; color:#aab;
     }
     .player-tab.active { background:#f5c542; color:#0b0e14; border-color:#f5c542; }
     .player-tab:hover { border-color:#f5c542; }
 
     .add-player-form {
-      display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:10px;
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px;
     }
     .add-player-form input {
       background:#0a1414; border:1px solid #2a3a3a; color:#e8e8e8;
-      padding:6px 12px; border-radius:30px; font-size:0.85rem;
-      outline:none; width:140px;
+      padding:8px 14px; border-radius:40px; font-size:0.9rem;
+      outline:none; width:160px;
     }
     .add-player-form input:focus { border-color:#f5c542; }
 
     .manual-add {
-      display:flex; gap:6px; align-items:center; flex-wrap:wrap;
-      background:#0a1414; padding:8px 12px; border-radius:30px;
-      margin-bottom:10px; border:1px solid #2a3a3a;
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+      background:#0a1414; padding:10px 14px; border-radius:40px;
+      margin-bottom:12px; border:1px solid #2a3a3a;
     }
     .manual-add select, .manual-add input {
       background:#0a1414; border:1px solid #2a3a3a; color:#e8e8e8;
-      padding:5px 12px; border-radius:30px; font-size:0.8rem;
+      padding:6px 14px; border-radius:40px; font-size:0.85rem;
       outline:none;
     }
     .manual-add select:focus, .manual-add input:focus { border-color:#f5c542; }
-    .manual-add input { flex:1; min-width:100px; }
+    .manual-add input { flex:1; min-width:120px; }
 
-    .notebook-entries { max-height:280px; overflow-y:auto; }
+    .notebook-entries { max-height:350px; overflow-y:auto; }
     .notebook-entry {
-      background:#0a1414; padding:4px 12px; border-radius:6px;
-      margin:3px 0; display:flex; justify-content:space-between;
-      align-items:center; font-size:0.85rem; border-left:3px solid #f5c542;
+      background:#0a1414; padding:6px 14px; border-radius:8px;
+      margin:4px 0; display:flex; justify-content:space-between;
+      align-items:center; font-size:0.9rem; border-left:3px solid #f5c542;
     }
-    .notebook-entry .entry-label { color:#f5c542; font-weight:600; min-width:70px; }
-    .notebook-entry .entry-value { color:#e8e8e8; flex:1; margin:0 8px; cursor:pointer; }
-    .notebook-entry .entry-actions button { background:none; border:none; color:#667; cursor:pointer; font-size:0.7rem; }
+    .notebook-entry .entry-label { color:#f5c542; font-weight:600; min-width:80px; }
+    .notebook-entry .entry-value { color:#e8e8e8; flex:1; margin:0 10px; cursor:pointer; }
+    .notebook-entry .entry-actions button { background:none; border:none; color:#667; cursor:pointer; font-size:0.8rem; }
     .notebook-entry .entry-actions button:hover { color:#ff6666; }
 
-    .notebook-empty { color:#556; font-style:italic; text-align:center; padding:10px 0; font-size:0.9rem; }
+    .notebook-empty { color:#556; font-style:italic; text-align:center; padding:12px 0; }
+
+    .info-cards {
+      display:flex; flex-wrap:wrap; gap:16px; justify-content:center; width:100%; margin:10px 0;
+    }
+    .info-card {
+      background:#101818; border:1px solid #2a3a3a; border-radius:14px;
+      padding:16px 22px; flex:1 1 180px; max-width:250px; text-align:center;
+    }
+    .info-card h4 { color:#f5c542; font-weight:400; letter-spacing:1px; }
+    .info-card .value { font-size:1.4rem; font-weight:700; color:#f0f0f0; }
 
     .footer {
-      margin-top:16px; padding:10px 0; width:100%; text-align:center;
-      border-top:1px solid #1a2a2a; color:#445; font-size:0.65rem;
+      margin-top:20px; padding:12px 0; width:100%; text-align:center;
+      border-top:1px solid #1a2a2a; color:#445; font-size:0.7rem;
     }
     .footer span { color:#667; font-weight:400; }
 
     @media (max-width:600px) {
       .header h1 { font-size:2rem; }
-      .btn { font-size:0.9rem; padding:10px 20px; }
-      .card { flex:1 1 100%; max-width:100%; min-height:80px; }
-      .card .card-value { font-size:0.9rem; }
+      .btn { font-size:1rem; padding:12px 24px; }
+      .card { flex:1 1 100%; max-width:100%; min-height:90px; }
+      .card .card-value { font-size:1rem; }
       .manual-add { flex-direction:column; align-items:stretch; }
-      .info-chip { font-size:0.75rem; padding:4px 12px; }
+      .info-card { flex:1 1 100%; }
     }
   </style>
 </head>
@@ -165,17 +161,14 @@
   <div class="btn-group">
     <button class="btn" id="startBtn">▶ НАЧАТЬ</button>
     <button class="btn btn-secondary hidden" id="restartBtn">⟳ НАЧАТЬ ЗАНОВО</button>
-    <button class="btn btn-outline" id="catastropheBtn">🌪️ Эпидемия</button>
-    <button class="btn btn-outline" id="bunkerBtn">📦 Бункер</button>
+    <button class="btn btn-outline" id="catastropheBtn">🌪️ Рандомная эпидемия</button>
+    <button class="btn btn-outline" id="bunkerBtn">📦 Содержимое бункера</button>
   </div>
 
-  <!-- КОМПАКТНЫЕ ИНФО-КАРТОЧКИ -->
-  <div class="info-row" id="infoRow"></div>
-
-  <!-- КАРТЫ -->
   <div class="cards-grid" id="cardsContainer"></div>
 
-  <!-- БЛОКНОТ -->
+  <div class="info-cards" id="infoCards"></div>
+
   <div class="notebook">
     <div class="notebook-header">
       <h3>📓 Блокнот</h3>
@@ -203,14 +196,14 @@
         <option value="Другое">Другое</option>
       </select>
       <input type="text" id="manualValue" placeholder="Что выпало игроку?">
-      <button class="btn btn-green btn-small" id="manualAddBtn">➕ Добавить</button>
+      <button class="btn btn-green btn-small" id="manualAddBtn">➕ Добавить карту</button>
     </div>
 
     <div class="notebook-entries" id="notebookEntries">
       <div class="notebook-empty">Выберите игрока</div>
     </div>
 
-    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-secondary btn-small" id="clearNotebookBtn">🧹 Очистить всё</button>
     </div>
   </div>
@@ -228,7 +221,7 @@
     const restartBtn = document.getElementById('restartBtn');
     const catastropheBtn = document.getElementById('catastropheBtn');
     const bunkerBtn = document.getElementById('bunkerBtn');
-    const infoRow = document.getElementById('infoRow');
+    const infoCards = document.getElementById('infoCards');
 
     const playerTabs = document.getElementById('playerTabs');
     const notebookEntries = document.getElementById('notebookEntries');
@@ -285,11 +278,6 @@
     }
     function clearPlayerEntries(playerName) {
       setPlayerEntries(playerName, []);
-    }
-
-    // --- Очистка инфо-ряда ---
-    function clearInfoRow() {
-      infoRow.innerHTML = '';
     }
 
     // --- Рендер карт ---
@@ -382,7 +370,7 @@
     // --- Рендер вкладок ---
     function renderTabs() {
       if (allPlayers.length === 0) {
-        playerTabs.innerHTML = '<span style="color:#556;font-size:0.8rem;">Нет игроков. Добавьте!</span>';
+        playerTabs.innerHTML = '<span style="color:#556;font-size:0.85rem;">Нет игроков. Добавьте!</span>';
         notebookCount.textContent = '0 игроков';
         removePlayerBtn.style.display = 'none';
         return;
@@ -431,7 +419,7 @@
       renderNotebook(); saveState();
     }
 
-    // --- Загрузка карт с сервера (с очисткой инфо) ---
+    // --- Загрузка карт с сервера ---
     async function fetchCards() {
       try {
         const res = await fetch('/api/start');
@@ -439,7 +427,6 @@
         const raw = await res.json();
         currentCards = raw.map(c => ({ title: c.title, value: c.value, revealed: false, hidden: false }));
         renderCards();
-        clearInfoRow(); // Очищаем катастрофу/бункер
         startBtn.classList.add('hidden');
         restartBtn.classList.remove('hidden');
         saveState();
@@ -449,11 +436,10 @@
       }
     }
 
-    // --- Сброс игры (очищает всё: карты, инфо, но не блокнот) ---
+    // --- Сброс игры ---
     function resetGame() {
       currentCards = [];
       container.innerHTML = '';
-      clearInfoRow();
       restartBtn.classList.add('hidden');
       startBtn.classList.remove('hidden');
       saveState();
@@ -467,30 +453,30 @@
       renderNotebook(); saveState();
     }
 
-    // --- Рандомная эпидемия (компактно) ---
+    // --- Рандомная эпидемия ---
     async function fetchCatastrophe() {
       try {
         const res = await fetch('/api/catastrophe');
         if (!res.ok) throw new Error('Ошибка');
         const data = await res.json();
-        infoRow.innerHTML = `
-          <div class="info-chip"><span class="label">🌪️ Катастрофа:</span> <span class="value">${data.catastrophe}</span></div>
+        infoCards.innerHTML = `
+          <div class="info-card"><h4>🌪️ Катастрофа</h4><div class="value">${data.catastrophe}</div></div>
         `;
-      } catch(e) { infoRow.innerHTML = '<div class="info-chip"><span class="label">⚠️ Ошибка</span></div>'; }
+      } catch(e) { infoCards.innerHTML = '<div class="info-card"><h4>⚠️ Ошибка</h4></div>'; }
     }
 
-    // --- Содержимое бункера (компактно) ---
+    // --- Содержимое бункера ---
     async function fetchBunker() {
       try {
         const res = await fetch('/api/bunker');
         if (!res.ok) throw new Error('Ошибка');
         const data = await res.json();
-        let chips = '';
+        let html = '';
         data.forEach(item => {
-          chips += `<span class="info-chip"><span class="label">📦 ${item.item}:</span> <span class="value">${item.amount}</span></span>`;
+          html += `<div class="info-card"><h4>📦 ${item.item}</h4><div class="value">${item.amount}</div></div>`;
         });
-        infoRow.innerHTML = chips;
-      } catch(e) { infoRow.innerHTML = '<div class="info-chip"><span class="label">⚠️ Ошибка</span></div>'; }
+        infoCards.innerHTML = html;
+      } catch(e) { infoCards.innerHTML = '<div class="info-card"><h4>⚠️ Ошибка</h4></div>'; }
     }
 
     // --- Восстановление состояния ---
