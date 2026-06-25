@@ -3,206 +3,373 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Бункер 8.2</title>
+  <title>Игровой портал</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      background: #0b0e14;
-      background-image: radial-gradient(circle at 30% 10%, #1a2a2a, #050708);
+      background: #0a0e14;
+      background-image: radial-gradient(circle at 20% 30%, #1a2a3a, #05080a);
       min-height: 100vh;
       font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       color: #e8e8e8;
-      padding: 20px 12px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    .container { width:100%; max-width:1300px; display:flex; flex-direction:column; align-items:center; }
-    .header { text-align:center; margin-bottom:16px; width:100%; }
-    .header h1 {
-      font-size:2.6rem; font-weight:800; color:#f5c542;
-      text-shadow: 0 0 40px #f5c54233;
-      letter-spacing:2px;
+    .portal {
+      max-width: 1300px;
+      width: 100%;
     }
-    .header .sub { color:#8899aa; font-size:0.8rem; border-top:1px solid #2a3a3a; padding-top:6px; display:inline-block; }
 
-    .btn-group {
-      display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:16px; width:100%;
+    /* ХЕДЕР */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 10px 0;
+      border-bottom: 1px solid #1a2a3a;
+    }
+    .header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f5c542, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+      letter-spacing: 2px;
+    }
+    .header .sub {
+      color: #8899aa;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    /* ВЫБОР ИГРЫ */
+    .game-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .game-btn {
+      background: #141c24;
+      border: 1px solid #2a3a4a;
+      color: #c0d0e0;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      letter-spacing: 0.5px;
+    }
+    .game-btn:hover {
+      transform: translateY(-2px);
+      border-color: #f5c542;
+      box-shadow: 0 0 30px #f5c54222;
+    }
+    .game-btn.active {
+      background: #f5c542;
+      color: #0a0e14;
+      border-color: #f5c542;
+      box-shadow: 0 0 40px #f5c54244;
+    }
+
+    /* КНОПКИ ДЕЙСТВИЙ */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
     }
     .btn {
-      background:#f5c542; border:none; color:#0b0e14; font-weight:700;
-      padding:12px 28px; border-radius:60px; cursor:pointer;
-      transition:0.15s; font-size:1rem; box-shadow:0 0 20px #f5c54244;
+      background: #f5c542;
+      border: none;
+      color: #0a0e14;
+      font-weight: 700;
+      padding: 12px 32px;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.15s;
+      font-size: 1rem;
+      box-shadow: 0 0 30px #f5c54244;
     }
-    .btn:active { transform:scale(0.94); }
-    .btn-secondary { background:#1a2a2a; color:#c0d0d0; box-shadow:none; }
-    .btn-secondary:hover { background:#2a3a3a; }
-    .btn-outline { background:transparent; border:1px solid #f5c542; color:#f5c542; box-shadow:none; }
-    .btn-outline:hover { background:#f5c54222; }
-    .btn-danger { background:#6a1a1a; color:#ff8888; box-shadow:none; }
-    .btn-small { font-size:0.75rem; padding:5px 14px; }
-    .btn-green { background:#1a5a2a; color:#7aff7a; box-shadow:none; }
-
-    .hidden { display:none !important; }
+    .btn:active { transform: scale(0.94); }
+    .btn-secondary { background: #1a2a3a; color: #c0d0e0; box-shadow: none; }
+    .btn-secondary:hover { background: #2a3a4a; }
+    .btn-outline { background: transparent; border: 1px solid #f5c542; color: #f5c542; box-shadow: none; }
+    .btn-outline:hover { background: #f5c54222; }
+    .btn-danger { background: #6a1a1a; color: #ff8888; box-shadow: none; }
+    .btn-small { font-size: 0.8rem; padding: 6px 16px; }
+    .btn-green { background: #1a5a2a; color: #7aff7a; box-shadow: none; }
+    .hidden { display: none !important; }
 
     /* КАРТЫ */
     .cards-grid {
-      display:flex; flex-wrap:wrap; justify-content:center; gap:12px;
-      width:100%; margin:12px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      width: 100%;
+      margin: 12px 0;
     }
     .card {
-      background:#141c1c; border-left:6px solid #f5c542; border-radius:12px;
-      padding:12px 14px; flex:1 1 180px; max-width:220px; min-width:150px;
-      box-shadow:0 6px 20px #00000099; text-align:center;
-      display:flex; flex-direction:column; justify-content:center; min-height:100px;
-      cursor:pointer; transition:0.2s; user-select:none;
+      background: #141c24;
+      border-left: 6px solid #f5c542;
+      border-radius: 14px;
+      padding: 14px 18px;
+      flex: 1 1 180px;
+      max-width: 230px;
+      min-width: 150px;
+      box-shadow: 0 8px 30px #00000099;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 110px;
+      cursor: pointer;
+      transition: 0.2s;
+      user-select: none;
     }
-    .card:hover { transform:translateY(-3px); border-color:#f5a542; }
-    .card .card-title { font-size:0.55rem; text-transform:uppercase; letter-spacing:1.2px; color:#f5c542; margin-bottom:3px; }
-    .card .card-value { font-size:1rem; font-weight:600; color:#f0f0f0; line-height:1.3; word-break:break-word; }
-    .card .card-status { font-size:0.55rem; color:#667; margin-top:5px; }
-    .card.revealed { border-color:#7aff7a; background:#1a2a1a; }
-    .card.revealed .card-status { color:#7aff7a; }
-    .card.hidden-card { border-color:#555; opacity:0.5; }
-    .card.hidden-card .card-value { color:#889; }
+    .card:hover { transform: translateY(-4px); border-color: #ffa500; }
+    .card .card-title {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #f5c542;
+      margin-bottom: 4px;
+    }
+    .card .card-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f0f0f0;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+    .card .card-status {
+      font-size: 0.55rem;
+      color: #667;
+      margin-top: 6px;
+    }
+    .card.revealed { border-color: #7aff7a; background: #1a2a1a; }
+    .card.revealed .card-status { color: #7aff7a; }
+    .card.hidden-card { border-color: #555; opacity: 0.5; }
+    .card.hidden-card .card-value { color: #889; }
 
-    /* ДВЕ КОЛОНКИ ДЛЯ ИНФО */
+    /* ПАНЕЛИ */
     .info-panels {
-      display:flex; flex-wrap:wrap; gap:16px; justify-content:center;
-      width:100%; margin:6px 0 12px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      width: 100%;
+      margin: 6px 0 12px 0;
     }
     .info-panel {
-      background:#101818; border:1px solid #2a3a3a; border-radius:16px;
-      padding:12px 18px; flex:1 1 280px; max-width:400px; min-width:200px;
+      background: #101820;
+      border: 1px solid #1a2a3a;
+      border-radius: 16px;
+      padding: 12px 18px;
+      flex: 1 1 280px;
+      max-width: 400px;
+      min-width: 200px;
     }
     .info-panel h4 {
-      color:#f5c542; font-weight:400; font-size:0.9rem;
-      letter-spacing:0.5px; margin-bottom:6px;
-      border-bottom:1px solid #1a2a2a; padding-bottom:4px;
-    }
-    .info-panel .chip-container {
-      display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+      color: #f5c542;
+      font-weight: 400;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #1a2a3a;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
     }
     .info-chip {
-      background:#0a1414; border:1px solid #2a3a3a; border-radius:30px;
-      padding:4px 14px; display:inline-flex; align-items:center; gap:6px;
-      font-size:0.85rem; color:#e8e8e8;
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      border-radius: 30px;
+      padding: 4px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #e8e8e8;
+      margin: 3px;
     }
-    .info-chip .label { color:#f5c542; font-weight:600; }
-    .info-chip .value { color:#f0f0f0; font-weight:500; }
-    .info-empty {
-      color:#556; font-style:italic; font-size:0.85rem;
-      padding:4px 0;
-    }
+    .info-chip .label { color: #f5c542; font-weight: 600; }
+    .info-chip .value { color: #f0f0f0; font-weight: 500; }
+    .info-empty { color: #556; font-style: italic; font-size: 0.85rem; padding: 4px 0; }
 
     /* БЛОКНОТ */
     .notebook {
-      background:#101818; border:1px solid #2a3a3a; border-radius:16px;
-      padding:14px 18px; width:100%; max-width:1000px; margin:12px 0;
+      background: #101820;
+      border: 1px solid #1a2a3a;
+      border-radius: 16px;
+      padding: 14px 18px;
+      width: 100%;
+      max-width: 1000px;
+      margin: 12px 0;
     }
     .notebook-header {
-      display:flex; justify-content:space-between; align-items:center;
-      flex-wrap:wrap; gap:8px; border-bottom:1px solid #2a3a3a;
-      padding-bottom:8px; margin-bottom:10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 1px solid #1a2a3a;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
     }
-    .notebook-header h3 { color:#f5c542; font-weight:400; font-size:1.1rem; letter-spacing:0.5px; }
-    .notebook-header .badge { background:#1a2a2a; padding:3px 14px; border-radius:30px; font-size:0.75rem; color:#aab; }
+    .notebook-header h3 { color: #f5c542; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.5px; }
+    .notebook-header .badge { background: #1a2a3a; padding: 3px 14px; border-radius: 30px; font-size: 0.75rem; color: #aab; }
 
     .player-tabs {
-      display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 10px;
     }
     .player-tab {
-      background:#0a1414; border:1px solid #2a3a3a; padding:4px 14px;
-      border-radius:30px; cursor:pointer; font-size:0.8rem;
-      transition:0.1s; color:#aab;
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      padding: 4px 14px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: 0.1s;
+      color: #aab;
     }
-    .player-tab.active { background:#f5c542; color:#0b0e14; border-color:#f5c542; }
-    .player-tab:hover { border-color:#f5c542; }
+    .player-tab.active { background: #f5c542; color: #0a0e14; border-color: #f5c542; }
+    .player-tab:hover { border-color: #f5c542; }
 
     .add-player-form {
-      display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:10px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
     }
     .add-player-form input {
-      background:#0a1414; border:1px solid #2a3a3a; color:#e8e8e8;
-      padding:6px 12px; border-radius:30px; font-size:0.85rem;
-      outline:none; width:140px;
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      color: #e8e8e8;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      outline: none;
+      width: 140px;
     }
-    .add-player-form input:focus { border-color:#f5c542; }
+    .add-player-form input:focus { border-color: #f5c542; }
 
     .manual-add {
-      display:flex; gap:6px; align-items:center; flex-wrap:wrap;
-      background:#0a1414; padding:8px 12px; border-radius:30px;
-      margin-bottom:10px; border:1px solid #2a3a3a;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: #0a141c;
+      padding: 8px 12px;
+      border-radius: 30px;
+      margin-bottom: 10px;
+      border: 1px solid #1a2a3a;
     }
     .manual-add select, .manual-add input {
-      background:#0a1414; border:1px solid #2a3a3a; color:#e8e8e8;
-      padding:5px 12px; border-radius:30px; font-size:0.8rem;
-      outline:none;
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      color: #e8e8e8;
+      padding: 5px 12px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      outline: none;
     }
-    .manual-add select:focus, .manual-add input:focus { border-color:#f5c542; }
-    .manual-add input { flex:1; min-width:100px; }
+    .manual-add select:focus, .manual-add input:focus { border-color: #f5c542; }
+    .manual-add input { flex: 1; min-width: 100px; }
 
-    .notebook-entries { max-height:280px; overflow-y:auto; }
+    .notebook-entries { max-height: 280px; overflow-y: auto; }
     .notebook-entry {
-      background:#0a1414; padding:4px 12px; border-radius:6px;
-      margin:3px 0; display:flex; justify-content:space-between;
-      align-items:center; font-size:0.85rem; border-left:3px solid #f5c542;
+      background: #0a141c;
+      padding: 4px 12px;
+      border-radius: 6px;
+      margin: 3px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      border-left: 3px solid #f5c542;
     }
-    .notebook-entry .entry-label { color:#f5c542; font-weight:600; min-width:70px; }
-    .notebook-entry .entry-value { color:#e8e8e8; flex:1; margin:0 8px; cursor:pointer; }
-    .notebook-entry .entry-actions button { background:none; border:none; color:#667; cursor:pointer; font-size:0.7rem; }
-    .notebook-entry .entry-actions button:hover { color:#ff6666; }
+    .notebook-entry .entry-label { color: #f5c542; font-weight: 600; min-width: 70px; }
+    .notebook-entry .entry-value { color: #e8e8e8; flex: 1; margin: 0 8px; cursor: pointer; }
+    .notebook-entry .entry-actions button { background: none; border: none; color: #667; cursor: pointer; font-size: 0.7rem; }
+    .notebook-entry .entry-actions button:hover { color: #ff6666; }
     .notebook-entry .entry-count {
-      background:#1a2a2a; padding:0 10px; border-radius:20px;
-      font-size:0.7rem; color:#aab; margin-left:6px;
+      background: #1a2a3a;
+      padding: 0 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      color: #aab;
+      margin-left: 6px;
     }
-
-    .notebook-empty { color:#556; font-style:italic; text-align:center; padding:10px 0; font-size:0.9rem; }
+    .notebook-empty { color: #556; font-style: italic; text-align: center; padding: 10px 0; font-size: 0.9rem; }
 
     .footer {
-      margin-top:16px; padding:10px 0; width:100%; text-align:center;
-      border-top:1px solid #1a2a2a; color:#445; font-size:0.65rem;
+      margin-top: 20px;
+      padding: 10px 0;
+      width: 100%;
+      text-align: center;
+      border-top: 1px solid #1a2a3a;
+      color: #445;
+      font-size: 0.7rem;
     }
-    .footer span { color:#667; font-weight:400; }
+    .footer span { color: #667; font-weight: 400; }
 
-    @media (max-width:600px) {
-      .header h1 { font-size:2rem; }
-      .btn { font-size:0.9rem; padding:10px 20px; }
-      .card { flex:1 1 100%; max-width:100%; min-height:80px; }
-      .card .card-value { font-size:0.9rem; }
-      .manual-add { flex-direction:column; align-items:stretch; }
-      .info-panel { flex:1 1 100%; max-width:100%; }
+    @media (max-width: 600px) {
+      .header h1 { font-size: 2rem; }
+      .game-btn { font-size: 0.8rem; padding: 8px 16px; }
+      .btn { font-size: 0.9rem; padding: 10px 20px; }
+      .card { flex: 1 1 100%; max-width: 100%; min-height: 80px; }
+      .card .card-value { font-size: 0.9rem; }
+      .info-panel { flex: 1 1 100%; max-width: 100%; }
+      .manual-add { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
+<div class="portal">
+  <!-- ХЕДЕР -->
   <div class="header">
-    <h1>🏚️ БУНКЕР 8.2</h1>
-    <div class="sub">8 карт · эпидемии · бункер · новый контент</div>
+    <h1>🎮 ИГРОВОЙ ПОРТАЛ</h1>
+    <div class="sub">Выбери игру, добавь игроков и начинай</div>
   </div>
 
-  <div class="btn-group">
+  <!-- ВЫБОР ИГРЫ -->
+  <div class="game-selector">
+    <button class="game-btn active" data-game="bunker">🏚️ Бункер</button>
+    <button class="game-btn" data-game="mafia">🔪 Мафия</button>
+    <button class="game-btn" data-game="zombie">🧟 Зомби</button>
+    <!-- Заготовки под будущие игры -->
+    <button class="game-btn" data-game="spy" style="opacity:0.5;cursor:default;">🕵️ Шпион (скоро)</button>
+    <button class="game-btn" data-game="carnival" style="opacity:0.5;cursor:default;">🎭 Карнавал (скоро)</button>
+    <button class="game-btn" data-game="doctor" style="opacity:0.5;cursor:default;">🏥 Доктор Хаос (скоро)</button>
+  </div>
+
+  <!-- КНОПКИ ДЕЙСТВИЙ -->
+  <div class="action-bar">
     <button class="btn" id="startBtn">▶ НАЧАТЬ</button>
     <button class="btn btn-secondary hidden" id="restartBtn">⟳ НАЧАТЬ ЗАНОВО</button>
     <button class="btn btn-outline" id="catastropheBtn">🌪️ Эпидемия</button>
     <button class="btn btn-outline" id="bunkerBtn">📦 Бункер</button>
   </div>
 
-  <!-- ДВЕ ПАНЕЛИ: КАТАСТРОФА И БУНКЕР -->
+  <!-- ПАНЕЛИ -->
   <div class="info-panels">
     <div class="info-panel" id="catastrophePanel">
       <h4>🌪️ Катастрофа / Эпидемия</h4>
-      <div class="chip-container" id="catastropheContent">
-        <span class="info-empty">Не выбрана</span>
-      </div>
+      <div class="chip-container" id="catastropheContent"><span class="info-empty">Не выбрана</span></div>
     </div>
     <div class="info-panel" id="bunkerPanel">
       <h4>📦 Содержимое бункера</h4>
-      <div class="chip-container" id="bunkerContent">
-        <span class="info-empty">Не загружено</span>
-      </div>
+      <div class="chip-container" id="bunkerContent"><span class="info-empty">Не загружено</span></div>
     </div>
   </div>
 
@@ -234,6 +401,7 @@
         <option value="Здоровье">Здоровье</option>
         <option value="Характер">Характер</option>
         <option value="Фобия">Фобия</option>
+        <option value="Условие">Условие</option>
         <option value="Другое">Другое</option>
       </select>
       <input type="text" id="manualValue" placeholder="Что выпало игроку?">
@@ -276,26 +444,28 @@
     const manualValue = document.getElementById('manualValue');
     const manualAddBtn = document.getElementById('manualAddBtn');
 
+    const gameBtns = document.querySelectorAll('.game-btn');
+
     // --- Состояние ---
+    let currentGame = 'bunker';
     let currentCards = [];
     let currentPlayer = '';
     let allPlayers = [];
+    const STORAGE_KEY = 'portal_data';
 
     // --- localStorage ---
-    const STORAGE_KEY = 'bunker82_data';
-
     function loadState() {
       try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return null; const data = JSON.parse(raw); if (data.cards && data.players && data.notebook) return data; return null; } catch { return null; }
     }
     function saveState() {
       const notebook = getNotebook();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ cards: currentCards, players: allPlayers, notebook, currentPlayer }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ cards: currentCards, players: allPlayers, notebook, currentPlayer, game: currentGame }));
     }
     function getNotebook() {
       try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return {}; const data = JSON.parse(raw); return data.notebook || {}; } catch { return {}; }
     }
     function saveNotebook(notebook) {
-      const state = loadState() || { cards: [], players: [], notebook: {}, currentPlayer: '' };
+      const state = loadState() || { cards: [], players: [], notebook: {}, currentPlayer: '', game: 'bunker' };
       state.notebook = notebook;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
@@ -308,36 +478,39 @@
       notebook[playerName] = entries;
       saveNotebook(notebook);
     }
-
-    // --- СТАКАНИЕ (группировка) ---
     function addEntryToPlayer(playerName, title, value) {
       const entries = getPlayerEntries(playerName);
-      // Ищем существующую запись с таким же title и value
       const existing = entries.find(e => e.title === title && e.value === value);
-      if (existing) {
-        existing.count = (existing.count || 1) + 1;
-      } else {
-        entries.push({ title, value, count: 1 });
-      }
+      if (existing) { existing.count = (existing.count || 1) + 1; }
+      else { entries.push({ title, value, count: 1 }); }
       setPlayerEntries(playerName, entries);
     }
-
     function deleteEntryFromPlayer(playerName, index) {
       const entries = getPlayerEntries(playerName);
-      if (entries[index].count > 1) {
-        entries[index].count -= 1;
-      } else {
-        entries.splice(index, 1);
-      }
+      if (entries[index].count > 1) { entries[index].count -= 1; }
+      else { entries.splice(index, 1); }
       setPlayerEntries(playerName, entries);
     }
-
     function clearPlayerEntries(playerName) {
       setPlayerEntries(playerName, []);
     }
 
-    // --- Очистка панелей (только по кнопкам) ---
-    // Оставляем возможность очистить вручную, но не автоматически
+    // --- Переключение игры ---
+    function switchGame(game) {
+      currentGame = game;
+      gameBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.game === game);
+      });
+      // Очищаем карты
+      currentCards = [];
+      container.innerHTML = '';
+      startBtn.classList.remove('hidden');
+      restartBtn.classList.add('hidden');
+      // Сбрасываем эпидемию и бункер
+      catastropheContent.innerHTML = '<span class="info-empty">Не выбрана</span>';
+      bunkerContent.innerHTML = '<span class="info-empty">Не загружено</span>';
+      saveState();
+    }
 
     // --- Рендер карт ---
     function renderCards() {
@@ -370,7 +543,7 @@
       });
     }
 
-    // --- Рендер блокнота (с учётом стакания) ---
+    // --- Рендер блокнота ---
     function renderNotebook() {
       if (!currentPlayer) { notebookEntries.innerHTML = `<div class="notebook-empty">Выберите игрока</div>`; return; }
       const entries = getPlayerEntries(currentPlayer);
@@ -409,7 +582,7 @@
           input.value = currentText;
           input.style.width = 'auto';
           input.style.minWidth = '100px';
-          input.style.background = '#0a1414';
+          input.style.background = '#0a141c';
           input.style.color = '#e8e8e8';
           input.style.border = '1px solid #f5c542';
           input.style.borderRadius = '6px';
@@ -471,7 +644,7 @@
       renderTabs(); renderNotebook(); saveState();
     }
 
-    // --- Ручное добавление карты (с поддержкой стакания) ---
+    // --- Ручное добавление карты ---
     function manualAddCard() {
       if (!currentPlayer) { alert('Сначала выберите игрока'); return; }
       const category = manualCategory.value;
@@ -482,10 +655,10 @@
       renderNotebook(); saveState();
     }
 
-    // --- Загрузка карт с сервера (НЕ очищаем эпидемию и бункер) ---
+    // --- Загрузка карт с сервера ---
     async function fetchCards() {
       try {
-        const res = await fetch('/api/start');
+        const res = await fetch(`/api/game/${currentGame}`);
         if (!res.ok) throw new Error('Ошибка сервера');
         const raw = await res.json();
         currentCards = raw.map(c => ({ title: c.title, value: c.value, revealed: false, hidden: false }));
@@ -499,7 +672,7 @@
       }
     }
 
-    // --- Сброс игры (НЕ очищаем эпидемию и бункер) ---
+    // --- Сброс игры ---
     function resetGame() {
       currentCards = [];
       container.innerHTML = '';
@@ -516,21 +689,17 @@
       renderNotebook(); saveState();
     }
 
-    // --- Рандомная эпидемия (в левую панель) ---
+    // --- Эпидемия ---
     async function fetchCatastrophe() {
       try {
         const res = await fetch('/api/catastrophe');
         if (!res.ok) throw new Error('Ошибка');
         const data = await res.json();
-        catastropheContent.innerHTML = `
-          <div class="info-chip"><span class="label">🌪️</span> <span class="value">${data.catastrophe}</span></div>
-        `;
-      } catch(e) {
-        catastropheContent.innerHTML = `<span class="info-empty">⚠️ Ошибка</span>`;
-      }
+        catastropheContent.innerHTML = `<div class="info-chip"><span class="label">🌪️</span> <span class="value">${data.catastrophe}</span></div>`;
+      } catch(e) { catastropheContent.innerHTML = `<span class="info-empty">⚠️ Ошибка</span>`; }
     }
 
-    // --- Содержимое бункера (в правую панель) ---
+    // --- Бункер ---
     async function fetchBunker() {
       try {
         const res = await fetch('/api/bunker');
@@ -541,15 +710,14 @@
           chips += `<div class="info-chip"><span class="label">${item.item}:</span> <span class="value">${item.amount}</span></div>`;
         });
         bunkerContent.innerHTML = chips || `<span class="info-empty">Пусто</span>`;
-      } catch(e) {
-        bunkerContent.innerHTML = `<span class="info-empty">⚠️ Ошибка</span>`;
-      }
+      } catch(e) { bunkerContent.innerHTML = `<span class="info-empty">⚠️ Ошибка</span>`; }
     }
 
     // --- Восстановление состояния ---
     function restoreState() {
       const saved = loadState();
       if (!saved) return false;
+      if (saved.game) switchGame(saved.game);
       if (saved.cards && saved.cards.length > 0) {
         currentCards = saved.cards;
         renderCards();
@@ -575,6 +743,18 @@
     clearNotebookBtn.addEventListener('click', clearCurrentPlayerNotebook);
     manualAddBtn.addEventListener('click', manualAddCard);
     manualValue.addEventListener('keydown', (e) => { if (e.key === 'Enter') manualAddCard(); });
+
+    // Переключение игры
+    gameBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const game = btn.dataset.game;
+        if (game === 'spy' || game === 'carnival' || game === 'doctor') {
+          alert('🚧 Эта игра в разработке! Скоро появится.');
+          return;
+        }
+        switchGame(game);
+      });
+    });
 
     // --- Инициализация ---
     const restored = restoreState();
