@@ -120,8 +120,19 @@ const mafiaRoles = [
   'Мафия', 'Мафия', 'Шериф', 'Доктор'
 ];
 
-function generateMafiaSet() {
-  const shuffled = [...mafiaRoles].sort(() => Math.random() - 0.5);
+function generateMafiaSet(playerCount = 6) {
+  // Балансируем роли под количество игроков
+  let roles = [];
+  if (playerCount <= 4) {
+    roles = ['Мирный', 'Мирный', 'Мафия', 'Шериф'];
+  } else if (playerCount <= 6) {
+    roles = ['Мирный', 'Мирный', 'Мирный', 'Мафия', 'Шериф', 'Доктор'];
+  } else {
+    const extra = playerCount - 7;
+    roles = ['Мирный', 'Мирный', 'Мирный', 'Мафия', 'Мафия', 'Шериф', 'Доктор'];
+    for (let i = 0; i < extra; i++) roles.push('Мирный');
+  }
+  const shuffled = roles.sort(() => Math.random() - 0.5);
   return shuffled.map((role, i) => ({
     title: `Игрок ${i + 1}`,
     value: role
@@ -129,29 +140,23 @@ function generateMafiaSet() {
 }
 
 // ============================================================
-// ИГРА 3: ЗОМБИ-АПОКАЛИПСИС
+// ИГРА 3: ШПИОН
 // ============================================================
 
-const zombieResources = [
-  'Еда', 'Вода', 'Аптечка', 'Оружие', 'Инструменты',
-  'Патроны', 'Бензин', 'Лопата', 'Палатка', 'Фонарь'
+const spyLocations = [
+  'Военный бункер', 'Заброшенная станция', 'Космический корабль',
+  'Подводная лодка', 'Остров сокровищ', 'Город-призрак',
+  'Полярная станция', 'Джунгли', 'Пустыня', 'Гора Эверест',
+  'Центр управления полётами', 'Подземный город'
 ];
 
-function generateZombieSet() {
-  const used = [];
-  const pick = (arr) => {
-    const val = getUniqueRandom(arr, used);
-    used.push(val);
-    return val;
-  };
-  const resources = [];
-  for (let i = 0; i < 5; i++) {
-    resources.push({
-      title: 'Ресурс',
-      value: `${pick(zombieResources)}: ${Math.floor(Math.random() * 20) + 1}`
-    });
-  }
-  return resources;
+function generateSpySet(playerCount = 5) {
+  const location = random(spyLocations);
+  const isSpy = Math.random() < 1 / playerCount; // 1 шпион на игру
+  return [
+    { title: 'Локация', value: location },
+    { title: 'Роль', value: isSpy ? '🕵️ Шпион' : 'Мирный' }
+  ];
 }
 
 // ============================================================
@@ -160,16 +165,17 @@ function generateZombieSet() {
 
 app.get('/api/game/:mode', (req, res) => {
   const mode = req.params.mode;
+  const count = parseInt(req.query.count) || 6;
   let data = [];
   switch (mode) {
     case 'bunker':
       data = generateBunkerSet();
       break;
     case 'mafia':
-      data = generateMafiaSet();
+      data = generateMafiaSet(count);
       break;
-    case 'zombie':
-      data = generateZombieSet();
+    case 'spy':
+      data = generateSpySet(count);
       break;
     default:
       data = generateBunkerSet();
@@ -204,5 +210,5 @@ app.get('/api/bunker', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`[PORTAL] Запущен на порту ${PORT}`);
-  console.log(`[PORTAL] Игры: Бункер, Мафия, Зомби`);
+  console.log(`[PORTAL] Игры: Бункер, Мафия, Шпион`);
 });

@@ -35,7 +35,6 @@
       background: linear-gradient(135deg, #f5c542, #ff8c00);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: none;
       letter-spacing: 2px;
     }
     .header .sub {
@@ -63,7 +62,6 @@
       cursor: pointer;
       transition: 0.2s;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      letter-spacing: 0.5px;
     }
     .game-btn:hover {
       transform: translateY(-2px);
@@ -311,6 +309,22 @@
     }
     .notebook-empty { color: #556; font-style: italic; text-align: center; padding: 10px 0; font-size: 0.9rem; }
 
+    /* ИНСТРУКЦИИ ДЛЯ ИГР */
+    .game-rules {
+      background: #101820;
+      border: 1px solid #1a2a3a;
+      border-radius: 16px;
+      padding: 12px 18px;
+      margin: 8px 0 12px 0;
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+      color: #aab;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .game-rules strong { color: #f5c542; }
+
     .footer {
       margin-top: 20px;
       padding: 10px 0;
@@ -330,6 +344,7 @@
       .card .card-value { font-size: 0.9rem; }
       .info-panel { flex: 1 1 100%; max-width: 100%; }
       .manual-add { flex-direction: column; align-items: stretch; }
+      .game-rules { font-size: 0.8rem; }
     }
   </style>
 </head>
@@ -346,11 +361,12 @@
   <div class="game-selector">
     <button class="game-btn active" data-game="bunker">🏚️ Бункер</button>
     <button class="game-btn" data-game="mafia">🔪 Мафия</button>
-    <button class="game-btn" data-game="zombie">🧟 Зомби</button>
-    <!-- Заготовки под будущие игры -->
-    <button class="game-btn" data-game="spy" style="opacity:0.5;cursor:default;">🕵️ Шпион (скоро)</button>
-    <button class="game-btn" data-game="carnival" style="opacity:0.5;cursor:default;">🎭 Карнавал (скоро)</button>
-    <button class="game-btn" data-game="doctor" style="opacity:0.5;cursor:default;">🏥 Доктор Хаос (скоро)</button>
+    <button class="game-btn" data-game="spy">🕵️ Шпион</button>
+  </div>
+
+  <!-- ПРАВИЛА (динамические) -->
+  <div class="game-rules" id="gameRules">
+    <strong>🏚️ Бункер:</strong> 8–9 карт (профессия, возраст, факт, хобби, багаж, здоровье, характер, фобия, условие). Голосуйте, кого выгнать из бункера!
   </div>
 
   <!-- КНОПКИ ДЕЙСТВИЙ -->
@@ -402,6 +418,8 @@
         <option value="Характер">Характер</option>
         <option value="Фобия">Фобия</option>
         <option value="Условие">Условие</option>
+        <option value="Роль">Роль</option>
+        <option value="Локация">Локация</option>
         <option value="Другое">Другое</option>
       </select>
       <input type="text" id="manualValue" placeholder="Что выпало игроку?">
@@ -432,6 +450,7 @@
     const bunkerBtn = document.getElementById('bunkerBtn');
     const catastropheContent = document.getElementById('catastropheContent');
     const bunkerContent = document.getElementById('bunkerContent');
+    const gameRules = document.getElementById('gameRules');
 
     const playerTabs = document.getElementById('playerTabs');
     const notebookEntries = document.getElementById('notebookEntries');
@@ -452,6 +471,13 @@
     let currentPlayer = '';
     let allPlayers = [];
     const STORAGE_KEY = 'portal_data';
+
+    // --- Правила ---
+    const rules = {
+      bunker: '<strong>🏚️ Бункер:</strong> 8–9 карт (профессия, возраст, факт, хобби, багаж, здоровье, характер, фобия, условие). Голосуйте, кого выгнать из бункера!',
+      mafia: '<strong>🔪 Мафия:</strong> Мирные, мафия, шериф, доктор. Ночью мафия убивает, днём все голосуют. Шериф проверяет, доктор лечит.',
+      spy: '<strong>🕵️ Шпион:</strong> Один игрок — шпион (не знает локацию). Остальные знают локацию. Обсуждайте 5 минут, шпион должен угадать или остаться незамеченным.'
+    };
 
     // --- localStorage ---
     function loadState() {
@@ -501,12 +527,11 @@
       gameBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.game === game);
       });
-      // Очищаем карты
+      gameRules.innerHTML = rules[game] || rules.bunker;
       currentCards = [];
       container.innerHTML = '';
       startBtn.classList.remove('hidden');
       restartBtn.classList.add('hidden');
-      // Сбрасываем эпидемию и бункер
       catastropheContent.innerHTML = '<span class="info-empty">Не выбрана</span>';
       bunkerContent.innerHTML = '<span class="info-empty">Не загружено</span>';
       saveState();
@@ -658,7 +683,8 @@
     // --- Загрузка карт с сервера ---
     async function fetchCards() {
       try {
-        const res = await fetch(`/api/game/${currentGame}`);
+        const count = allPlayers.length || 6;
+        const res = await fetch(`/api/game/${currentGame}?count=${count}`);
         if (!res.ok) throw new Error('Ошибка сервера');
         const raw = await res.json();
         currentCards = raw.map(c => ({ title: c.title, value: c.value, revealed: false, hidden: false }));
@@ -744,15 +770,9 @@
     manualAddBtn.addEventListener('click', manualAddCard);
     manualValue.addEventListener('keydown', (e) => { if (e.key === 'Enter') manualAddCard(); });
 
-    // Переключение игры
     gameBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        const game = btn.dataset.game;
-        if (game === 'spy' || game === 'carnival' || game === 'doctor') {
-          alert('🚧 Эта игра в разработке! Скоро появится.');
-          return;
-        }
-        switchGame(game);
+        switchGame(btn.dataset.game);
       });
     });
 
