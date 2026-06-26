@@ -76,6 +76,7 @@
     .btn-success { background: #1a5a2a; color: #7aff7a; }
     .btn-danger { background: #6a1a1a; color: #ff8888; }
     .btn-outline { background: transparent; border: 1px solid #f5c542; color: #f5c542; }
+    .btn-outline:hover { background: #f5c54222; }
     .btn-small { font-size: 0.8rem; padding: 6px 16px; }
     .hidden { display: none !important; }
 
@@ -137,6 +138,7 @@
       border-radius: 16px;
       padding: 12px 18px;
       flex: 1;
+      min-width: 200px;
     }
     .info-panel h4 { color: #f5c542; font-weight: 400; margin-bottom: 6px; }
     .info-chip {
@@ -149,6 +151,11 @@
       font-size: 0.85rem;
     }
     .info-chip .label { color: #f5c542; font-weight: 600; }
+    .info-empty {
+      color: #556;
+      font-style: italic;
+      font-size: 0.85rem;
+    }
 
     .player-list {
       display: flex;
@@ -192,6 +199,7 @@
       .header h1 { font-size: 1.8rem; }
       .game-btn { font-size: 0.8rem; padding: 8px 16px; }
       .card-item { flex: 1 1 100%; max-width: 100%; }
+      .info-panel { flex: 1 1 100%; }
     }
   </style>
 </head>
@@ -220,7 +228,20 @@
         <button class="btn btn-outline" id="bunkerCatastropheBtn">🌪️ Эпидемия</button>
         <button class="btn btn-outline" id="bunkerContentsBtn">📦 Бункер</button>
       </div>
-      <div class="info-panels" id="bunkerInfoPanels"></div>
+
+      <!-- ДВЕ ОТДЕЛЬНЫЕ ПАНЕЛИ -->
+      <div class="info-panels">
+        <div class="info-panel" id="catastrophePanel">
+          <h4>🌪️ Катастрофа / Эпидемия</h4>
+          <div id="catastropheContent"><span class="info-empty">Не выбрана</span></div>
+        </div>
+        <div class="info-panel" id="bunkerPanel">
+          <h4>📦 Содержимое бункера</h4>
+          <div id="bunkerContent"><span class="info-empty">Не загружено</span></div>
+        </div>
+      </div>
+
+      <!-- КАРТЫ -->
       <div class="cards-grid" id="bunkerCards"></div>
     </div>
   </div>
@@ -290,17 +311,19 @@
 
     // --- БУНКЕР ---
     const bunkerCards = document.getElementById('bunkerCards');
-    const bunkerInfoPanels = document.getElementById('bunkerInfoPanels');
+    const catastropheContent = document.getElementById('catastropheContent');
+    const bunkerContent = document.getElementById('bunkerContent');
 
     function renderBunkerCards(cards) {
       bunkerCards.innerHTML = '';
       cards.forEach(card => {
         const div = document.createElement('div');
         div.className = 'card-item';
+        const descHtml = card.desc ? `<div class="card-desc">${card.desc}</div>` : '';
         div.innerHTML = `
           <div class="card-title">${card.title}</div>
           <div class="card-value">${card.value}</div>
-          ${card.desc ? `<div class="card-desc">${card.desc}</div>` : ''}
+          ${descHtml}
         `;
         bunkerCards.appendChild(div);
       });
@@ -317,33 +340,39 @@
     }
 
     async function fetchCatastrophe() {
-      const res = await fetch('/api/catastrophe');
-      const data = await res.json();
-      bunkerInfoPanels.innerHTML = `
-        <div class="info-panel"><h4>🌪️ Катастрофа</h4><span class="info-chip"><span class="label">${data.catastrophe}</span></span></div>
-      `;
+      try {
+        const res = await fetch('/api/catastrophe');
+        const data = await res.json();
+        catastropheContent.innerHTML = `<span class="info-chip"><span class="label">${data.catastrophe}</span></span>`;
+      } catch(e) {
+        catastropheContent.innerHTML = '<span class="info-empty">⚠️ Ошибка</span>';
+      }
     }
 
     async function fetchBunkerContents() {
-      const res = await fetch('/api/bunker');
-      const data = await res.json();
-      let html = '<div class="info-panel"><h4>📦 Содержимое</h4>';
-      data.forEach(item => {
-        html += `<span class="info-chip"><span class="label">${item.item}:</span> ${item.amount}</span>`;
-      });
-      html += '</div>';
-      bunkerInfoPanels.innerHTML = html;
+      try {
+        const res = await fetch('/api/bunker');
+        const data = await res.json();
+        let html = '';
+        data.forEach(item => {
+          html += `<span class="info-chip"><span class="label">${item.item}:</span> ${item.amount}</span>`;
+        });
+        bunkerContent.innerHTML = html || '<span class="info-empty">Пусто</span>';
+      } catch(e) {
+        bunkerContent.innerHTML = '<span class="info-empty">⚠️ Ошибка</span>';
+      }
     }
 
     document.getElementById('bunkerStartBtn').addEventListener('click', fetchBunkerCards);
     document.getElementById('bunkerRestartBtn').addEventListener('click', () => {
       bunkerCards.innerHTML = '';
-      bunkerInfoPanels.innerHTML = '';
+      catastropheContent.innerHTML = '<span class="info-empty">Не выбрана</span>';
+      bunkerContent.innerHTML = '<span class="info-empty">Не загружено</span>';
     });
     document.getElementById('bunkerCatastropheBtn').addEventListener('click', fetchCatastrophe);
     document.getElementById('bunkerContentsBtn').addEventListener('click', fetchBunkerContents);
 
-    // --- ОНЛАЙН (Socket.IO) ---
+    // --- ОНЛАЙН ---
     const socket = io();
 
     const lobbyScreen = document.getElementById('lobbyScreen');
@@ -514,11 +543,6 @@
       }
       updateGameLog(data.log || []);
       renderActionArea(data);
-    });
-
-    socket.on('phaseUpdate', (data) => {
-      phaseDisplay.textContent = data.phase === 'night' ? '🌙 Ночь' : '☀️ День';
-      if (data.log) updateGameLog(data.log);
     });
 
     socket.on('nightResult', (data) => {
