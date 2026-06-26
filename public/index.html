@@ -229,7 +229,6 @@
         <button class="btn btn-outline" id="bunkerContentsBtn">📦 Бункер</button>
       </div>
 
-      <!-- ДВЕ ОТДЕЛЬНЫЕ ПАНЕЛИ -->
       <div class="info-panels">
         <div class="info-panel" id="catastrophePanel">
           <h4>🌪️ Катастрофа / Эпидемия</h4>
@@ -241,7 +240,6 @@
         </div>
       </div>
 
-      <!-- КАРТЫ -->
       <div class="cards-grid" id="bunkerCards"></div>
     </div>
   </div>
@@ -355,7 +353,8 @@
         const data = await res.json();
         let html = '';
         data.forEach(item => {
-          html += `<span class="info-chip"><span class="label">${item.item}:</span> ${item.amount}</span>`;
+          html += `<div class="info-chip"><span class="label">${item.item}:</span> ${item.amount}</div>`;
+          if (item.desc) html += `<div style="font-size:0.7rem;color:#8899aa;margin-left:10px;">${item.desc}</div>`;
         });
         bunkerContent.innerHTML = html || '<span class="info-empty">Пусто</span>';
       } catch(e) {
@@ -426,7 +425,7 @@
       if (gameType === 'mafia') {
         if (data.phase === 'night') {
           const role = data.roles ? data.roles[socket.id] : '';
-          if (role === 'Мафия') {
+          if (role === 'Мафия' || role === 'Дон мафии') {
             const alive = data.alive || [];
             if (alive.length > 0) {
               const select = document.createElement('select');

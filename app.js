@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // ============================================================
-// БУНКЕР — ДАННЫЕ
+// БУНКЕР — ДАННЫЕ С УНИКАЛЬНЫМИ ОПИСАНИЯМИ
 // ============================================================
 
 const ages = [];
@@ -79,12 +79,7 @@ const bunkerFacts = [
   { text: 'Убивал человека', desc: 'Способен на жестокость.' },
   { text: 'Торговал оружием', desc: 'Достанет любой ствол.' },
   { text: 'Вампир', desc: 'Пьёт кровь, боится солнца.' },
-  { text: 'Имеет тату на интимном месте', desc: 'Может шокировать или соблазнять.' },
-  { text: 'Знает, как хранить еду без холода', desc: 'Сбережёт запасы.' },
-  { text: 'Умеет шить одежду', desc: 'Починит любую вещь.' },
-  { text: 'Может управлять лодкой', desc: 'Переплывёт реку или море.' },
-  { text: 'Знает, как чинить рацию', desc: 'Восстановит связь.' },
-  { text: 'Умеет дрессировать животных', desc: 'Защитник или помощник.' }
+  { text: 'Имеет тату на интимном месте', desc: 'Может шокировать или соблазнять.' }
 ];
 
 const bunkerHobbies = [
@@ -104,10 +99,7 @@ const bunkerHobbies = [
   { name: 'Паркур', desc: 'Убегает, преодолевает препятствия.' },
   { name: 'Медитация', desc: 'Контролирует панику, стресс.' },
   { name: 'Шахматы', desc: 'Стратегическое мышление.' },
-  { name: 'Чтение книг', desc: 'Широкий кругозор, знания.' },
-  { name: 'Оригами', desc: 'Из бумаги можно сделать карты.' },
-  { name: 'Плетение сетей', desc: 'Ловит рыбу, птиц.' },
-  { name: 'Разведение растений', desc: 'Еда своими руками.' }
+  { name: 'Чтение книг', desc: 'Широкий кругозор, знания.' }
 ];
 
 const bunkerBaggage = [
@@ -121,7 +113,7 @@ const bunkerBaggage = [
   { name: 'Чемодан с вещами', desc: 'Одежда, инструменты, вещи.' },
   { name: 'Наркотики', desc: 'Обезболивание, но зависимость.' },
   { name: 'Дрон', desc: 'Разведка, съёмка.' },
-  { name: 'Вибратор (на батарейках)', desc: 'Успокаивает, помогает уснуть.' },
+  { name: 'Вибратор', desc: 'Успокаивает, помогает уснуть.' },
   { name: 'Презервативы', desc: 'Защита от болезней.' },
   { name: 'Смазка', desc: 'Для механизмов или интима.' },
   { name: 'Порножурнал', desc: 'Поднимает настроение.' },
@@ -210,11 +202,10 @@ const bunkerConditions = [
 ];
 
 // ============================================================
-// ГЕНЕРАЦИЯ БУНКЕРА (ИСПРАВЛЕННАЯ)
+// ГЕНЕРАЦИЯ БУНКЕРА
 // ============================================================
 
 function generateBunkerSet() {
-  // Выбираем уникальные объекты для каждой карты
   const prof = random(professions);
   const fact = random(bunkerFacts);
   const hobby = random(bunkerHobbies);
@@ -223,7 +214,6 @@ function generateBunkerSet() {
   const character = random(bunkerCharacter);
   const phobia = random(bunkerPhobias);
 
-  // Собираем карты с их собственными описаниями
   const cards = [
     { title: 'Профессия', value: prof.name, desc: prof.desc },
     { title: 'Возраст', value: `${random(ages)} лет`, desc: 'Влияет на здоровье и опыт.' },
@@ -235,7 +225,6 @@ function generateBunkerSet() {
     { title: 'Фобия', value: phobia.name, desc: phobia.desc }
   ];
 
-  // Условие — отдельно, с шансом 40%
   if (Math.random() < 0.4) {
     const condition = random(bunkerConditions);
     cards.push({ title: '⚡ Условие', value: condition.name, desc: condition.desc });
@@ -271,19 +260,110 @@ app.get('/api/catastrophe', (req, res) => {
 
 app.get('/api/bunker', (req, res) => {
   const contents = [
-    { item: 'Еда', min: 0, max: 100 },
-    { item: 'Вода', min: 0, max: 100 },
-    { item: 'Аптечка', min: 0, max: 5 },
-    { item: 'Инструменты', min: 0, max: 20 },
-    { item: 'Книги', min: 0, max: 10 },
-    { item: 'Дети в инкубаторах', min: 0, max: 3 }
+    { 
+      item: 'Еда', 
+      min: 0, max: 100, 
+      desc: 'Можно обменять на голос или использовать для выживания.',
+      effect: 'Если еды > 50, все игроки получают +1 защиту от голосования.'
+    },
+    { 
+      item: 'Вода', 
+      min: 0, max: 100, 
+      desc: 'Нужна для питья. Если воды нет — все теряют по 1 карте здоровья.',
+      effect: 'Если воды < 10, каждый раунд случайный игрок теряет 1 карту.'
+    },
+    { 
+      item: 'Аптечка', 
+      min: 0, max: 5, 
+      desc: 'Лечит одну болезнь у любого игрока.',
+      effect: 'Можно использовать, чтобы спасти игрока от изгнания.'
+    },
+    { 
+      item: 'Инструменты', 
+      min: 0, max: 20, 
+      desc: 'Чинят генератор, укрепляют стены.',
+      effect: 'Если инструментов > 10, стены бункера не разрушаются при эпидемии.'
+    },
+    { 
+      item: 'Книги', 
+      min: 0, max: 10, 
+      desc: 'Дают знания: можно узнать слабость любого игрока.',
+      effect: 'Одна книга = одна скрытая карта другого игрока.'
+    },
+    { 
+      item: 'Дети в инкубаторах', 
+      min: 0, max: 3, 
+      desc: 'Будущее человечества. Если они погибают — все проигрывают.',
+      effect: 'Если детей > 0, все игроки обязаны голосовать за их защиту.'
+    },
+    { 
+      item: 'Топливо', 
+      min: 0, max: 20, 
+      desc: 'Можно сбежать из бункера.',
+      effect: 'Если топлива > 10, можно покинуть бункер и выиграть.'
+    },
+    { 
+      item: 'Патроны', 
+      min: 0, max: 30, 
+      desc: 'Усиливают карту «Ружьё».',
+      effect: 'Каждые 10 патронов дают +1 голос против любого игрока.'
+    },
+    { 
+      item: 'Золото', 
+      min: 0, max: 50, 
+      desc: 'Бесполезно, но можно обменять на голос.',
+      effect: 'Можно купить защиту от изгнания за 20 золота.'
+    }
   ];
+
   const content = contents.map(c => ({
     item: c.item,
-    amount: Math.floor(Math.random() * (c.max - c.min + 1)) + c.min
+    amount: Math.floor(Math.random() * (c.max - c.min + 1)) + c.min,
+    desc: c.desc,
+    effect: c.effect
   }));
+
   res.json(content);
 });
+
+// ============================================================
+// МАФИЯ — РАСШИРЕННЫЕ РОЛИ (ДОН, ШЛЮХА, ДОКТОР, ШЕРИФ)
+// ============================================================
+
+function generateMafiaRoles(playerCount) {
+  let roles = [];
+
+  const mafiaCount = Math.min(Math.floor(playerCount / 3), 4);
+  const hasDon = playerCount >= 6;
+  const hasDoctor = playerCount >= 4;
+  const hasSheriff = playerCount >= 3;
+  const hasWhore = playerCount >= 5;
+
+  // Мафия + Дон
+  for (let i = 0; i < mafiaCount; i++) {
+    if (hasDon && i === 0) {
+      roles.push('Дон мафии');
+    } else {
+      roles.push('Мафия');
+    }
+  }
+
+  // Шериф
+  if (hasSheriff) roles.push('Шериф');
+
+  // Доктор
+  if (hasDoctor) roles.push('Доктор');
+
+  // Шлюха
+  if (hasWhore) roles.push('Шлюха');
+
+  // Мирные
+  while (roles.length < playerCount) {
+    roles.push('Мирный');
+  }
+
+  return roles.sort(() => Math.random() - 0.5);
+}
 
 // ============================================================
 // ОНЛАЙН: МАФИЯ И ШПИОН
@@ -296,18 +376,6 @@ function generateRoomCode() {
   let code = 'MAFIA-';
   for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
   return code;
-}
-
-function generateMafiaRoles(count) {
-  let roles = [];
-  if (count <= 4) roles = ['Мирный', 'Мирный', 'Мафия', 'Шериф'];
-  else if (count <= 6) roles = ['Мирный', 'Мирный', 'Мирный', 'Мафия', 'Шериф', 'Доктор'];
-  else if (count <= 8) roles = ['Мирный', 'Мирный', 'Мирный', 'Мирный', 'Мафия', 'Мафия', 'Шериф', 'Доктор'];
-  else {
-    roles = ['Мирный', 'Мирный', 'Мирный', 'Мирный', 'Мафия', 'Мафия', 'Шериф', 'Доктор'];
-    for (let i = 0; i < count - 8; i++) roles.push('Мирный');
-  }
-  return roles.sort(() => Math.random() - 0.5);
 }
 
 const spyLocations = [
@@ -397,12 +465,13 @@ io.on('connection', (socket) => {
     const voter = room.players.find(p => p.id === socket.id);
     if (!voter) return;
     const idx = room.players.indexOf(voter);
-    if (room.roles[idx] !== 'Мафия') return;
+    const role = room.roles[idx];
+    if (role !== 'Мафия' && role !== 'Дон мафии') return;
 
     room.nightVotes[socket.id] = targetPlayerName;
     io.to(roomCode).emit('nightVoteUpdate', { votes: room.nightVotes });
 
-    const mafiaPlayers = room.players.filter((p, i) => room.roles[i] === 'Мафия');
+    const mafiaPlayers = room.players.filter((p, i) => room.roles[i] === 'Мафия' || room.roles[i] === 'Дон мафии');
     if (mafiaPlayers.every(p => room.nightVotes[p.id])) {
       const votes = Object.values(room.nightVotes);
       const target = votes.reduce((a, b) => votes.filter(v => v === a).length >= votes.filter(v => v === b).length ? a : b);
@@ -430,8 +499,8 @@ io.on('connection', (socket) => {
         room.gameLog.push(`☀️ Игрок ${target} выгнан!`);
         io.to(roomCode).emit('dayResult', { eliminated: target, alive: room.players.filter((p, i) => room.alive[i]).map(p => p.name) });
         const aliveRoles = room.players.filter((p, i) => room.alive[i]).map((p) => room.roles[room.players.indexOf(p)]);
-        const mafiaAlive = aliveRoles.filter(r => r === 'Мафия').length;
-        const civiliansAlive = aliveRoles.filter(r => r !== 'Мафия').length;
+        const mafiaAlive = aliveRoles.filter(r => r === 'Мафия' || r === 'Дон мафии').length;
+        const civiliansAlive = aliveRoles.filter(r => r !== 'Мафия' && r !== 'Дон мафии').length;
         if (mafiaAlive === 0) {
           room.gameLog.push('🏆 Мирные победили!');
           io.to(roomCode).emit('gameEnded', { winner: 'Мирные' });
@@ -467,5 +536,5 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, () => {
   console.log(`[PORTAL] Запущен на порту ${PORT}`);
-  console.log(`[PORTAL] Игры: Бункер, Мафия, Шпион`);
+  console.log(`[PORTAL] Игры: Бункер, Мафия (Дон, Шлюха), Шпион`);
 });
