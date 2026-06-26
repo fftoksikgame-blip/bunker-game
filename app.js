@@ -14,13 +14,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // ============================================================
-// БУНКЕР — ДАННЫЕ С УНИКАЛЬНЫМИ ОПИСАНИЯМИ
+// БУНКЕР — ДАННЫЕ
 // ============================================================
 
 const ages = [];
 for (let i = 18; i <= 110; i++) ages.push(i);
 
-// --- ПРОФЕССИИ (уникальные описания) ---
 const professions = [
   { name: 'Врач', desc: 'Лечит болезни, делает операции, спасает жизни.' },
   { name: 'Хирург', desc: 'Проводит сложные операции, удаляет аппендицит.' },
@@ -60,7 +59,6 @@ const professions = [
   { name: 'Стрелок', desc: 'Точно стреляет из любого оружия.' }
 ];
 
-// --- ФАКТЫ (уникальные) ---
 const bunkerFacts = [
   { text: 'Умеет добывать воду из почвы', desc: 'Находит воду даже в пустыне.' },
   { text: 'Знает склад с оружием', desc: 'Может найти оружие и патроны.' },
@@ -89,7 +87,6 @@ const bunkerFacts = [
   { text: 'Умеет дрессировать животных', desc: 'Защитник или помощник.' }
 ];
 
-// --- ХОББИ (уникальные) ---
 const bunkerHobbies = [
   { name: 'Стрельба из лука', desc: 'Охота, защита, меткость.' },
   { name: 'Метание ножей', desc: 'Точное оружие, можно использовать в бою.' },
@@ -113,7 +110,6 @@ const bunkerHobbies = [
   { name: 'Разведение растений', desc: 'Еда своими руками.' }
 ];
 
-// --- БАГАЖ (уникальный) ---
 const bunkerBaggage = [
   { name: 'Аптечка', desc: 'Лечит болезни и раны (1 раз).' },
   { name: 'Бомба', desc: 'Разрушает всё вокруг (можно взорвать стену).' },
@@ -137,7 +133,6 @@ const bunkerBaggage = [
   { name: 'Палатка', desc: 'Укрытие от дождя и холода.' }
 ];
 
-// --- ЗДОРОВЬЕ (уникальное) ---
 const bunkerHealth = [
   { name: 'Слеп на 1 глаз', desc: 'Плохое зрение, но привыкаешь.' },
   { name: 'Рак 4 степени', desc: 'Терминальная стадия, нужна аптечка.' },
@@ -162,7 +157,6 @@ const bunkerHealth = [
   { name: '4 почки', desc: 'Может пить больше воды.' }
 ];
 
-// --- ХАРАКТЕР (уникальный) ---
 const bunkerCharacter = [
   { name: 'Агрессивный', desc: 'Нападает первым, не прощает обид.' },
   { name: 'Миролюбивый', desc: 'Избегает конфликтов, ищет компромиссы.' },
@@ -187,7 +181,6 @@ const bunkerCharacter = [
   { name: 'Жестокий', desc: 'Не жалеет других, может причинять боль.' }
 ];
 
-// --- ФОБИИ (уникальные) ---
 const bunkerPhobias = [
   { name: 'Пауки', desc: 'Боится пауков, впадает в панику.' },
   { name: 'Клаустрофобия', desc: 'Боится закрытых пространств.' },
@@ -203,7 +196,6 @@ const bunkerPhobias = [
   { name: 'Темнота', desc: 'Боится темноты, включает свет.' }
 ];
 
-// --- УСЛОВИЯ (уникальные) ---
 const bunkerConditions = [
   { name: 'Можешь поменяться ЛЮБОЙ картой с любым игроком', desc: 'Обмен картами (кроме условия).' },
   { name: 'Если тебя выгонят — выбери игрока, ему +30 лет', desc: 'Может стать старше 110.' },
@@ -217,33 +209,38 @@ const bunkerConditions = [
   { name: 'Если ты выгнан — забираешь с собой одного игрока', desc: 'Уводит с собой.' }
 ];
 
-// --- ГЕНЕРАЦИЯ БУНКЕРА ---
-function generateBunkerSet() {
-  const used = [];
-  const pick = (arr, type = 'text') => {
-    const available = arr.filter(item => {
-      const val = type === 'text' ? item : item.name;
-      return !used.includes(val);
-    });
-    const chosen = available.length > 0 ? random(available) : random(arr);
-    const val = type === 'text' ? chosen : chosen.name;
-    used.push(val);
-    return chosen;
-  };
+// ============================================================
+// ГЕНЕРАЦИЯ БУНКЕРА (ИСПРАВЛЕННАЯ)
+// ============================================================
 
-  const cards = [];
-  cards.push({ title: 'Профессия', value: pick(professions, 'object').name, desc: pick(professions, 'object').desc });
-  cards.push({ title: 'Возраст', value: `${random(ages)} лет`, desc: 'Влияет на здоровье и опыт.' });
-  cards.push({ title: 'Факт', value: pick(bunkerFacts, 'object').text, desc: pick(bunkerFacts, 'object').desc });
-  cards.push({ title: 'Хобби', value: pick(bunkerHobbies, 'object').name, desc: pick(bunkerHobbies, 'object').desc });
-  cards.push({ title: 'Багаж', value: pick(bunkerBaggage, 'object').name, desc: pick(bunkerBaggage, 'object').desc });
-  cards.push({ title: 'Здоровье', value: pick(bunkerHealth, 'object').name, desc: pick(bunkerHealth, 'object').desc });
-  cards.push({ title: 'Характер', value: pick(bunkerCharacter, 'object').name, desc: pick(bunkerCharacter, 'object').desc });
-  cards.push({ title: 'Фобия', value: pick(bunkerPhobias, 'object').name, desc: pick(bunkerPhobias, 'object').desc });
+function generateBunkerSet() {
+  // Выбираем уникальные объекты для каждой карты
+  const prof = random(professions);
+  const fact = random(bunkerFacts);
+  const hobby = random(bunkerHobbies);
+  const baggage = random(bunkerBaggage);
+  const health = random(bunkerHealth);
+  const character = random(bunkerCharacter);
+  const phobia = random(bunkerPhobias);
+
+  // Собираем карты с их собственными описаниями
+  const cards = [
+    { title: 'Профессия', value: prof.name, desc: prof.desc },
+    { title: 'Возраст', value: `${random(ages)} лет`, desc: 'Влияет на здоровье и опыт.' },
+    { title: 'Факт', value: fact.text, desc: fact.desc },
+    { title: 'Хобби', value: hobby.name, desc: hobby.desc },
+    { title: 'Багаж', value: baggage.name, desc: baggage.desc },
+    { title: 'Здоровье', value: health.name, desc: health.desc },
+    { title: 'Характер', value: character.name, desc: character.desc },
+    { title: 'Фобия', value: phobia.name, desc: phobia.desc }
+  ];
+
+  // Условие — отдельно, с шансом 40%
   if (Math.random() < 0.4) {
-    const cond = pick(bunkerConditions, 'object');
-    cards.push({ title: '⚡ Условие', value: cond.name, desc: cond.desc });
+    const condition = random(bunkerConditions);
+    cards.push({ title: '⚡ Условие', value: condition.name, desc: condition.desc });
   }
+
   return cards;
 }
 
@@ -289,7 +286,7 @@ app.get('/api/bunker', (req, res) => {
 });
 
 // ============================================================
-// ОНЛАЙН: МАФИЯ И ШПИОН (без изменений)
+// ОНЛАЙН: МАФИЯ И ШПИОН
 // ============================================================
 
 const rooms = {};
