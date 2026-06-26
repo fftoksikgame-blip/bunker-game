@@ -13,7 +13,138 @@ app.use(express.static(path.join(__dirname, 'public')));
 const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // ============================================================
-// ХРАНИЛИЩЕ КОМНАТ
+// БУНКЕР (ОФЛАЙН) — ВСЕ ДАННЫЕ И ГЕНЕРАЦИЯ
+// ============================================================
+
+// --- Возраст ---
+const ages = [];
+for (let i = 18; i <= 110; i++) ages.push(i);
+
+// --- Профессии ---
+const professions = [
+  'Врач', 'Хирург', 'Фармацевт', 'Военный', 'Пожарный',
+  'Полицейский', 'Сапёр', 'Инженер', 'Робототехник', 'Программист',
+  'Электрик', 'Строитель', 'Плотник', 'Водитель', 'Лётчик',
+  'Моряк', 'Космонавт', 'Шахтёр', 'Геолог', 'Биолог',
+  'Химик', 'Учитель', 'Переводчик', 'Журналист', 'Психиатр',
+  'Ветеринар', 'Фермер', 'Охотник', 'Рыбак', 'Повар',
+  'Мясник', 'Стюардесса', 'Мать в декрете', 'Мастер бокса', 'Стрелок'
+];
+
+// --- Факты ---
+const bunkerFacts = [
+  'Умеет добывать воду', 'Знает склад с оружием', 'Вскрывает замки',
+  'Чинит генератор', 'Делает перевязки', 'Знает грибы и травы',
+  'Разжигает огонь', 'Управляет дроном', 'Знает азбуку Морзе',
+  'Делает взрывчатку', 'Маскируется', 'Строит укрытия',
+  'Был в тюрьме', 'Работал шпионом', 'Подделывает документы',
+  'Состоит в банде', 'Убивал человека', 'Торговал оружием',
+  'Вампир', 'Очень хочет секса', 'Имеет тату на интимном месте'
+];
+
+// --- Хобби ---
+const bunkerHobbies = [
+  'Стрельба из лука', 'Метание ножей', 'Игра на гитаре',
+  'Охота', 'Рыбалка', 'Сбор грибов', 'Ловушки', 'Ремонт часов',
+  'Радио', 'Алхимия', 'Фотография', 'Вышивание', 'Скульптура',
+  'Паркур', 'Медитация', 'Шахматы', 'Чтение книг'
+];
+
+// --- Багаж ---
+const bunkerBaggage = [
+  'Аптечка', 'Бомба', 'Ружьё', 'Патроны', 'Нож', 'Лук',
+  'Генератор', 'Чемодан с вещами', 'Наркотики', 'Дрон',
+  'Вибратор (на батарейках)', 'Презервативы (коробка)'
+];
+
+// --- Здоровье ---
+const bunkerHealth = [
+  'Слеп на 1 глаз', 'Рак 4 степени', 'Нет руки', 'Астматик',
+  'Аллергик', 'Наркозависимый', 'Диабет', 'Глухой',
+  'Немой', 'Геморрой', 'Глисты', 'Беременна', 'Амнезия',
+  'Вечно голодный', 'Суицидные мысли', 'Идеально здоров',
+  'Карлик', 'Склероз', 'Бесплодие', '2 сердца', '4 почки'
+];
+
+// --- Характер ---
+const bunkerCharacter = [
+  'Агрессивный', 'Миролюбивый', 'Хитрый', 'Наивный', 'Циничный',
+  'Оптимист', 'Пессимист', 'Флегматик', 'Холерик',
+  'Щедрый', 'Жадный', 'Скромный', 'Нарцисс', 'Эгоист',
+  'Лживый', 'Честный', 'Верный', 'Трусливый', 'Смелый'
+];
+
+// --- Фобии ---
+const bunkerPhobias = [
+  'Пауки', 'Клаустрофобия', 'Женщины', 'Огонь', 'Вода',
+  'Люди', 'Животные', 'Маньяки', 'Косметика'
+];
+
+// --- Условия ---
+const bunkerConditions = [
+  'Можешь поменяться ЛЮБОЙ картой с любым игроком',
+  'Если тебя выгонят — выбери игрока, ему +30 лет',
+  'Если тебя выгонят — забери ЛЮБУЮ карту у любого',
+  'Все голосуют заново, тебя НЕЛЬЗЯ выгнать',
+  'Твой голос считается за 2',
+  'Забери у любого 15 лет (случайно)',
+  'Человек слева голосует против себя в следующем раунде',
+  'Если тебя изгнали — все противники получают +1 голос'
+];
+
+// --- Генерация Бункера ---
+function generateBunkerSet() {
+  const used = [];
+  const pick = (arr) => {
+    const available = arr.filter(item => !used.includes(item));
+    const val = available.length > 0 ? random(available) : random(arr);
+    used.push(val);
+    return val;
+  };
+  const cards = [
+    { title: 'Профессия', value: pick(professions) },
+    { title: 'Возраст', value: `${random(ages)} лет` },
+    { title: 'Факт', value: pick(bunkerFacts) },
+    { title: 'Хобби', value: pick(bunkerHobbies) },
+    { title: 'Багаж', value: pick(bunkerBaggage) },
+    { title: 'Здоровье', value: pick(bunkerHealth) },
+    { title: 'Характер', value: pick(bunkerCharacter) },
+    { title: 'Фобия', value: pick(bunkerPhobias) }
+  ];
+  if (Math.random() < 0.4) {
+    cards.push({ title: '⚡ Условие', value: pick(bunkerConditions) });
+  }
+  return cards;
+}
+
+// --- API для Бункера (офлайн) ---
+app.get('/api/bunker', (req, res) => {
+  const contents = [
+    { item: 'Еда', min: 0, max: 100 },
+    { item: 'Вода', min: 0, max: 100 },
+    { item: 'Аптечка', min: 0, max: 5 },
+    { item: 'Инструменты', min: 0, max: 20 },
+    { item: 'Книги', min: 0, max: 10 },
+    { item: 'Дети в инкубаторах', min: 0, max: 3 }
+  ];
+  const content = contents.map(c => ({
+    item: c.item,
+    amount: Math.floor(Math.random() * (c.max - c.min + 1)) + c.min
+  }));
+  res.json(content);
+});
+
+app.get('/api/catastrophe', (req, res) => {
+  const catastrophes = [
+    'Землетрясение', 'Эпидемия', 'Астероид', 'Вампиры',
+    'Зомби-апокалипсис', 'Инопланетяне', 'Злые животные',
+    'Роботы', 'Пожары', 'Вулкан', 'Цунами'
+  ];
+  res.json({ catastrophe: random(catastrophes) });
+});
+
+// ============================================================
+// ОНЛАЙН: МАФИЯ И ШПИОН (КОМНАТЫ, РОЛИ, ГОЛОСОВАНИЕ)
 // ============================================================
 
 const rooms = {};
@@ -26,10 +157,6 @@ function generateRoomCode() {
   }
   return code;
 }
-
-// ============================================================
-// ГЕНЕРАЦИЯ РОЛЕЙ ДЛЯ МАФИИ (СЛУЧАЙНО)
-// ============================================================
 
 function generateMafiaRoles(playerCount) {
   let roles = [];
@@ -44,19 +171,14 @@ function generateMafiaRoles(playerCount) {
     roles = ['Мирный', 'Мирный', 'Мирный', 'Мирный', 'Мафия', 'Мафия', 'Шериф', 'Доктор'];
     for (let i = 0; i < extra; i++) roles.push('Мирный');
   }
-  // Перемешиваем — это и есть случайное распределение
   return roles.sort(() => Math.random() - 0.5);
 }
-
-// ============================================================
-// ЛОКАЦИИ ДЛЯ ШПИОНА
-// ============================================================
 
 const spyLocations = [
   'Военный бункер', 'Заброшенная станция', 'Космический корабль',
   'Подводная лодка', 'Остров сокровищ', 'Город-призрак',
   'Полярная станция', 'Джунгли', 'Пустыня', 'Гора Эверест',
-  'Центр управления полётами', 'Подземный город', 'Заброшенный парк аттракционов',
+  'Центр управления полётами', 'Подземный город', 'Заброшенный парк',
   'Необитаемый остров', 'Подземная лаборатория'
 ];
 
@@ -67,22 +189,19 @@ const spyLocations = [
 io.on('connection', (socket) => {
   console.log('Игрок подключился:', socket.id);
 
-  // --- СОЗДАНИЕ КОМНАТЫ ---
   socket.on('createRoom', (data) => {
     const { playerName, gameType } = data;
     const roomCode = generateRoomCode();
     rooms[roomCode] = {
       gameType: gameType || 'mafia',
       players: [{ id: socket.id, name: playerName, isHost: true }],
-      state: 'waiting', // waiting, playing, ended
+      state: 'waiting',
       roles: [],
       alive: [],
       phase: null,
       nightVotes: {},
       dayVotes: {},
       mafiaKill: null,
-      sheriffCheck: null,
-      doctorSave: null,
       spyLocation: null,
       spyIndex: -1,
       gameLog: []
@@ -93,7 +212,6 @@ io.on('connection', (socket) => {
     console.log(`[${roomCode}] Создана комната. Хост: ${playerName}`);
   });
 
-  // --- ПОДКЛЮЧЕНИЕ К КОМНАТЕ ---
   socket.on('joinRoom', (data) => {
     const { roomCode, playerName } = data;
     if (!rooms[roomCode]) {
@@ -112,7 +230,6 @@ io.on('connection', (socket) => {
     console.log(`[${roomCode}] ${playerName} подключился`);
   });
 
-  // --- НАЧАЛО ИГРЫ (только хост) ---
   socket.on('startGame', (roomCode) => {
     const room = rooms[roomCode];
     if (!room) return;
@@ -132,26 +249,12 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- НОЧЬ / ДЕНЬ (только хост) ---
-  socket.on('setPhase', (data) => {
-    const { roomCode, phase } = data;
-    const room = rooms[roomCode];
-    if (!room) return;
-    if (!room.players.find(p => p.id === socket.id && p.isHost)) return;
-
-    room.phase = phase;
-    io.to(roomCode).emit('phaseUpdate', { phase, log: room.gameLog });
-  });
-
-  // --- ГОЛОСОВАНИЕ (ночь: мафия) ---
   socket.on('nightVote', (data) => {
     const { roomCode, targetPlayerName } = data;
     const room = rooms[roomCode];
     if (!room || room.phase !== 'night') return;
-
     const voter = room.players.find(p => p.id === socket.id);
     if (!voter) return;
-
     const isMafia = room.roles[room.players.indexOf(voter)] === 'Мафия';
     if (!isMafia) return;
 
@@ -169,7 +272,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- ГОЛОСОВАНИЕ (день: все) ---
   socket.on('dayVote', (data) => {
     const { roomCode, targetPlayerName } = data;
     const room = rooms[roomCode];
@@ -193,7 +295,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- РЕАКЦИЯ НА ОТКЛЮЧЕНИЕ ---
   socket.on('disconnect', () => {
     console.log('Игрок отключился:', socket.id);
     for (const roomCode in rooms) {
@@ -215,10 +316,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// ============================================================
-// ЗАПУСК МАФИИ (СЛУЧАЙНЫЕ РОЛИ)
-// ============================================================
-
 function startMafia(room) {
   const playerCount = room.players.length;
   const roles = generateMafiaRoles(playerCount);
@@ -234,19 +331,14 @@ function startMafia(room) {
     roleMap[p.id] = roles[i];
   });
 
-  io.to(roomCode(room)).emit('gameStarted', { 
-    gameType: 'mafia', 
+  io.to(roomCode(room)).emit('gameStarted', {
+    gameType: 'mafia',
     roles: roleMap,
     alive: room.players.map(p => p.name),
     phase: 'night',
     log: room.gameLog
   });
-  io.to(roomCode(room)).emit('phaseUpdate', { phase: 'night', log: room.gameLog });
 }
-
-// ============================================================
-// ЗАПУСК ШПИОНА (СЛУЧАЙНЫЙ ШПИОН)
-// ============================================================
 
 function startSpy(room) {
   const playerCount = room.players.length;
@@ -274,10 +366,6 @@ function startSpy(room) {
   });
 }
 
-// ============================================================
-// ПРОВЕРКА ПОБЕДЫ В МАФИИ
-// ============================================================
-
 function checkMafiaWin(room) {
   const alivePlayers = room.players.filter((p, i) => room.alive[i]);
   const aliveRoles = alivePlayers.map((p) => room.roles[room.players.indexOf(p)]);
@@ -301,10 +389,18 @@ function roomCode(room) {
 }
 
 // ============================================================
+// ОБЩИЙ API
+// ============================================================
+
+app.get('/api/game/bunker', (req, res) => {
+  res.json(generateBunkerSet());
+});
+
+// ============================================================
 // ЗАПУСК СЕРВЕРА
 // ============================================================
 
 server.listen(PORT, () => {
-  console.log(`[PORTAL-ONLINE] Запущен на порту ${PORT}`);
-  console.log(`[PORTAL-ONLINE] Доступен по адресу: http://localhost:${PORT}`);
+  console.log(`[PORTAL] Запущен на порту ${PORT}`);
+  console.log(`[PORTAL] Игры: Бункер (офлайн), Мафия (онлайн), Шпион (онлайн)`);
 });

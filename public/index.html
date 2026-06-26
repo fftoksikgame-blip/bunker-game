@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Мафия & Шпион — Онлайн</title>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <title>Игровой портал</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -18,10 +17,7 @@
       flex-direction: column;
       align-items: center;
     }
-    .app {
-      max-width: 900px;
-      width: 100%;
-    }
+    .app { max-width: 1100px; width: 100%; }
     .header {
       text-align: center;
       margin-bottom: 20px;
@@ -37,7 +33,6 @@
       letter-spacing: 2px;
     }
     .header .sub { color: #8899aa; font-size: 0.9rem; }
-
     .card {
       background: #101820;
       border: 1px solid #1a2a3a;
@@ -78,11 +73,32 @@
     .btn:active { transform: scale(0.94); }
     .btn-secondary { background: #1a2a3a; color: #c0d0e0; }
     .btn-secondary:hover { background: #2a3a4a; }
-    .btn-danger { background: #6a1a1a; color: #ff8888; }
     .btn-success { background: #1a5a2a; color: #7aff7a; }
+    .btn-danger { background: #6a1a1a; color: #ff8888; }
     .btn-outline { background: transparent; border: 1px solid #f5c542; color: #f5c542; }
     .btn-small { font-size: 0.8rem; padding: 6px 16px; }
     .hidden { display: none !important; }
+
+    .game-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .game-btn {
+      background: #141c24;
+      border: 1px solid #2a3a4a;
+      color: #c0d0e0;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .game-btn:hover { border-color: #f5c542; box-shadow: 0 0 30px #f5c54222; }
+    .game-btn.active { background: #f5c542; color: #0a0e14; border-color: #f5c542; }
 
     .player-list {
       display: flex;
@@ -96,10 +112,8 @@
       border-radius: 30px;
       padding: 6px 16px;
       font-size: 0.9rem;
-      color: #e8e8e8;
     }
     .player-chip.host { border-color: #f5c542; background: #1a2a2a; }
-    .player-chip.dead { opacity: 0.3; text-decoration: line-through; }
 
     .log {
       background: #0a141c;
@@ -114,26 +128,6 @@
     }
     .log .entry { padding: 4px 0; border-bottom: 1px solid #0a141c; }
 
-    .vote-area {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin: 10px 0;
-    }
-    .vote-area select {
-      background: #0a141c;
-      border: 1px solid #1a2a3a;
-      color: #e8e8e8;
-      padding: 8px 16px;
-      border-radius: 30px;
-      font-size: 1rem;
-      flex: 1;
-      min-width: 120px;
-      outline: none;
-    }
-    .vote-area select:focus { border-color: #f5c542; }
-
     .role-reveal {
       background: #1a2a2a;
       border-radius: 12px;
@@ -144,281 +138,324 @@
     }
     .role-reveal .role { color: #f5c542; font-weight: 700; }
 
+    .cards-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin: 12px 0;
+    }
+    .card-item {
+      background: #141c24;
+      border-left: 6px solid #f5c542;
+      border-radius: 14px;
+      padding: 14px 18px;
+      flex: 1 1 180px;
+      max-width: 230px;
+      min-width: 150px;
+      text-align: center;
+      box-shadow: 0 8px 30px #00000099;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .card-item:hover { transform: translateY(-4px); border-color: #ffa500; }
+    .card-item .card-title { font-size: 0.6rem; text-transform: uppercase; color: #f5c542; }
+    .card-item .card-value { font-size: 1.1rem; font-weight: 600; color: #f0f0f0; }
+
+    .info-panels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin: 10px 0;
+    }
+    .info-panel {
+      background: #101820;
+      border: 1px solid #1a2a3a;
+      border-radius: 16px;
+      padding: 12px 18px;
+      flex: 1;
+    }
+    .info-panel h4 { color: #f5c542; font-weight: 400; margin-bottom: 6px; }
+    .info-chip {
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      border-radius: 30px;
+      padding: 4px 14px;
+      display: inline-block;
+      margin: 3px;
+      font-size: 0.85rem;
+    }
+    .info-chip .label { color: #f5c542; font-weight: 600; }
+
     @media (max-width: 600px) {
       .header h1 { font-size: 1.8rem; }
-      .input-group input, .input-group select { font-size: 0.9rem; }
-      .btn { font-size: 0.9rem; padding: 8px 18px; }
+      .game-btn { font-size: 0.8rem; padding: 8px 16px; }
+      .card-item { flex: 1 1 100%; max-width: 100%; }
     }
   </style>
 </head>
 <body>
 
 <div class="app" id="app">
-  <!-- ХЕДЕР -->
   <div class="header">
-    <h1>🎭 Мафия & Шпион</h1>
-    <div class="sub">Онлайн-игра с друзьями</div>
+    <h1>🎮 Игровой портал</h1>
+    <div class="sub">Бункер · Мафия · Шпион</div>
   </div>
 
-  <!-- ЭКРАН ВХОДА -->
-  <div id="lobbyScreen" class="card">
-    <h2>🏠 Вход в игру</h2>
-    <div class="input-group" style="margin-bottom:10px;">
-      <input type="text" id="playerNameInput" placeholder="Ваш ник" value="Игрок">
-      <select id="gameTypeSelect">
-        <option value="mafia">🔪 Мафия</option>
-        <option value="spy">🕵️ Шпион</option>
-      </select>
-    </div>
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <button class="btn" id="createRoomBtn">➕ Создать комнату</button>
-      <div style="display:flex; gap:6px; flex:1; min-width:200px;">
-        <input type="text" id="roomCodeInput" placeholder="Код комнаты" style="flex:1; background:#0a141c; border:1px solid #1a2a3a; color:#e8e8e8; padding:10px 16px; border-radius:30px; font-size:1rem; outline:none;">
-        <button class="btn btn-secondary" id="joinRoomBtn">🔗 Войти</button>
+  <!-- ВЫБОР ИГРЫ -->
+  <div class="game-selector">
+    <button class="game-btn active" data-game="bunker">🏚️ Бункер</button>
+    <button class="game-btn" data-game="mafia">🔪 Мафия</button>
+    <button class="game-btn" data-game="spy">🕵️ Шпион</button>
+  </div>
+
+  <!-- БУНКЕР (ОФЛАЙН) -->
+  <div id="bunkerSection">
+    <div class="card">
+      <h2>🏚️ Бункер</h2>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+        <button class="btn" id="bunkerStartBtn">▶ Начать</button>
+        <button class="btn btn-secondary" id="bunkerRestartBtn">⟳ Заново</button>
+        <button class="btn btn-outline" id="bunkerCatastropheBtn">🌪️ Эпидемия</button>
+        <button class="btn btn-outline" id="bunkerContentsBtn">📦 Бункер</button>
       </div>
+      <div class="info-panels" id="bunkerInfoPanels"></div>
+      <div class="cards-grid" id="bunkerCards"></div>
     </div>
-    <div id="errorMessage" style="color:#ff6666; margin-top:8px;"></div>
   </div>
 
-  <!-- ЭКРАН КОМНАТЫ -->
-  <div id="roomScreen" class="card hidden">
-    <h2>📦 Комната: <span id="roomCodeDisplay">---</span></h2>
-    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-      <span id="gameTypeDisplay" style="color:#aab;">Игра: Мафия</span>
-      <span id="playersCountDisplay" style="color:#aab;">Игроков: 0</span>
+  <!-- МАФИЯ / ШПИОН (ОНЛАЙН) -->
+  <div id="onlineSection" class="hidden">
+    <div id="lobbyScreen" class="card">
+      <h2>🏠 Вход в игру</h2>
+      <div class="input-group" style="margin-bottom:10px;">
+        <input type="text" id="playerNameInput" placeholder="Ваш ник" value="Игрок">
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn" id="createRoomBtn">➕ Создать комнату</button>
+        <div style="display:flex; gap:6px; flex:1; min-width:200px;">
+          <input type="text" id="roomCodeInput" placeholder="Код комнаты" style="flex:1; background:#0a141c; border:1px solid #1a2a3a; color:#e8e8e8; padding:10px 16px; border-radius:30px; font-size:1rem; outline:none;">
+          <button class="btn btn-secondary" id="joinRoomBtn">🔗 Войти</button>
+        </div>
+      </div>
+      <div id="onlineError" style="color:#ff6666; margin-top:8px;"></div>
     </div>
-    <div class="player-list" id="playerList"></div>
-    <button class="btn btn-success" id="startGameBtn">🚀 Начать игру</button>
-    <button class="btn btn-secondary" id="leaveRoomBtn">🚪 Выйти</button>
-  </div>
 
-  <!-- ЭКРАН ИГРЫ -->
-  <div id="gameScreen" class="card hidden">
-    <h2>🎮 Игра идёт</h2>
-    <div id="phaseDisplay" style="color:#f5c542; font-size:1.2rem; margin-bottom:8px;">🌙 Ночь</div>
-    <div class="log" id="gameLog"></div>
-    <div id="roleDisplay" class="role-reveal">
-      <span class="role" id="myRoleDisplay">???</span>
+    <div id="roomScreen" class="card hidden">
+      <h2>📦 Комната: <span id="roomCodeDisplay">---</span></h2>
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+        <span id="onlineGameType" style="color:#aab;">Игра: Мафия</span>
+        <span id="playersCountDisplay" style="color:#aab;">Игроков: 0</span>
+      </div>
+      <div class="player-list" id="playerList"></div>
+      <button class="btn btn-success" id="startGameBtn">🚀 Начать игру</button>
+      <button class="btn btn-secondary" id="leaveRoomBtn">🚪 Выйти</button>
     </div>
-    <div id="actionArea"></div>
-    <button class="btn btn-secondary" id="leaveGameBtn">🚪 Выйти из игры</button>
+
+    <div id="gameScreen" class="card hidden">
+      <h2>🎮 Игра идёт</h2>
+      <div id="phaseDisplay" style="color:#f5c542; font-size:1.2rem;">🌙 Ночь</div>
+      <div class="log" id="gameLog"></div>
+      <div class="role-reveal"><span class="role" id="myRoleDisplay">???</span></div>
+      <div id="actionArea"></div>
+      <button class="btn btn-secondary" id="leaveGameBtn">🚪 Выйти</button>
+    </div>
   </div>
 </div>
 
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-  const socket = io();
+  (function() {
+    // --- ПЕРЕКЛЮЧЕНИЕ ИГР ---
+    const gameBtns = document.querySelectorAll('.game-btn');
+    const bunkerSection = document.getElementById('bunkerSection');
+    const onlineSection = document.getElementById('onlineSection');
 
-  // --- DOM ---
-  const lobbyScreen = document.getElementById('lobbyScreen');
-  const roomScreen = document.getElementById('roomScreen');
-  const gameScreen = document.getElementById('gameScreen');
-  const roomCodeDisplay = document.getElementById('roomCodeDisplay');
-  const gameTypeDisplay = document.getElementById('gameTypeDisplay');
-  const playersCountDisplay = document.getElementById('playersCountDisplay');
-  const playerList = document.getElementById('playerList');
-  const gameLog = document.getElementById('gameLog');
-  const phaseDisplay = document.getElementById('phaseDisplay');
-  const myRoleDisplay = document.getElementById('myRoleDisplay');
-  const actionArea = document.getElementById('actionArea');
-  const errorMessage = document.getElementById('errorMessage');
+    let currentGame = 'bunker';
 
-  const playerNameInput = document.getElementById('playerNameInput');
-  const gameTypeSelect = document.getElementById('gameTypeSelect');
-  const roomCodeInput = document.getElementById('roomCodeInput');
-
-  let currentRoom = null;
-  let isHost = false;
-  let myPlayerName = '';
-  let gameState = null;
-
-  // --- ОБРАБОТЧИКИ КНОПОК ---
-  document.getElementById('createRoomBtn').addEventListener('click', () => {
-    const name = playerNameInput.value.trim() || 'Игрок';
-    const gameType = gameTypeSelect.value;
-    myPlayerName = name;
-    socket.emit('createRoom', { playerName: name, gameType });
-  });
-
-  document.getElementById('joinRoomBtn').addEventListener('click', () => {
-    const name = playerNameInput.value.trim() || 'Игрок';
-    const code = roomCodeInput.value.trim().toUpperCase();
-    if (!code) { showError('Введите код комнаты'); return; }
-    myPlayerName = name;
-    socket.emit('joinRoom', { roomCode: code, playerName: name });
-  });
-
-  document.getElementById('startGameBtn').addEventListener('click', () => {
-    if (currentRoom) {
-      socket.emit('startGame', currentRoom);
+    function switchGame(game) {
+      currentGame = game;
+      gameBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.game === game);
+      });
+      if (game === 'bunker') {
+        bunkerSection.classList.remove('hidden');
+        onlineSection.classList.add('hidden');
+      } else {
+        bunkerSection.classList.add('hidden');
+        onlineSection.classList.remove('hidden');
+        document.getElementById('onlineGameType').textContent = `Игра: ${game === 'mafia' ? '🔪 Мафия' : '🕵️ Шпион'}`;
+      }
     }
-  });
 
-  document.getElementById('leaveRoomBtn').addEventListener('click', () => {
-    leaveRoom();
-  });
-
-  document.getElementById('leaveGameBtn').addEventListener('click', () => {
-    leaveRoom();
-  });
-
-  function leaveRoom() {
-    socket.disconnect();
-    socket.connect();
-    resetUI();
-    location.reload();
-  }
-
-  function showError(msg) {
-    errorMessage.textContent = msg;
-    setTimeout(() => errorMessage.textContent = '', 5000);
-  }
-
-  function resetUI() {
-    lobbyScreen.classList.remove('hidden');
-    roomScreen.classList.add('hidden');
-    gameScreen.classList.add('hidden');
-    currentRoom = null;
-    isHost = false;
-    gameState = null;
-  }
-
-  // --- SOCKET СОБЫТИЯ ---
-  socket.on('roomCreated', (data) => {
-    currentRoom = data.roomCode;
-    isHost = true;
-    lobbyScreen.classList.add('hidden');
-    roomScreen.classList.remove('hidden');
-    roomCodeDisplay.textContent = data.roomCode;
-    gameTypeDisplay.textContent = `Игра: ${gameTypeSelect.options[gameTypeSelect.selectedIndex].text}`;
-  });
-
-  socket.on('joinedRoom', (data) => {
-    currentRoom = data.roomCode;
-    isHost = false;
-    lobbyScreen.classList.add('hidden');
-    roomScreen.classList.remove('hidden');
-    roomCodeDisplay.textContent = data.roomCode;
-    gameTypeDisplay.textContent = `Игра: ${data.gameType === 'mafia' ? '🔪 Мафия' : '🕵️ Шпион'}`;
-  });
-
-  socket.on('playersUpdate', (players) => {
-    updatePlayerList(players);
-    playersCountDisplay.textContent = `Игроков: ${players.length}`;
-  });
-
-  socket.on('gameStarted', (data) => {
-    roomScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
-    gameState = data;
-    phaseDisplay.textContent = data.phase === 'night' ? '🌙 Ночь' : '☀️ День';
-    // Показываем роль игрока
-    const role = data.roles ? data.roles[socket.id] : '???';
-    myRoleDisplay.textContent = role || '???';
-    if (data.gameType === 'spy' && data.location) {
-      myRoleDisplay.textContent += ` | Локация: ${data.location}`;
-    }
-    updateGameLog(data.log || []);
-    renderActionArea(data);
-  });
-
-  socket.on('phaseUpdate', (data) => {
-    phaseDisplay.textContent = data.phase === 'night' ? '🌙 Ночь' : '☀️ День';
-    if (data.log) updateGameLog(data.log);
-  });
-
-  socket.on('nightVoteUpdate', (data) => {
-    // Обновление голосов мафии
-  });
-
-  socket.on('nightResult', (data) => {
-    updateGameLog([`🌙 Мафия выбрала ${data.kill}`]);
-  });
-
-  socket.on('dayVoteUpdate', (data) => {
-    // Обновление голосов
-  });
-
-  socket.on('dayResult', (data) => {
-    updateGameLog([`☀️ Игрок ${data.eliminated} выгнан!`]);
-    if (data.alive) {
-      // Обновляем список живых
-    }
-  });
-
-  socket.on('gameEnded', (data) => {
-    updateGameLog([`🏆 Победили: ${data.winner}!`]);
-    phaseDisplay.textContent = `🏆 Игра окончена! Победили: ${data.winner}`;
-    actionArea.innerHTML = '<p style="color:#f5c542;">Игра завершена. Нажмите "Выйти" чтобы начать новую.</p>';
-  });
-
-  socket.on('error', (msg) => {
-    showError(msg);
-  });
-
-  socket.on('connect_error', () => {
-    showError('Ошибка подключения к серверу');
-  });
-
-  // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
-  function updatePlayerList(players) {
-    playerList.innerHTML = '';
-    players.forEach(p => {
-      const chip = document.createElement('span');
-      chip.className = 'player-chip' + (p.isHost ? ' host' : '');
-      chip.textContent = p.name + (p.isHost ? ' 👑' : '');
-      playerList.appendChild(chip);
+    gameBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchGame(btn.dataset.game);
+      });
     });
-  }
 
-  function updateGameLog(entries) {
-    gameLog.innerHTML = '';
-    entries.forEach(entry => {
-      const div = document.createElement('div');
-      div.className = 'entry';
-      div.textContent = entry;
-      gameLog.appendChild(div);
+    // --- БУНКЕР (ОФЛАЙН) ---
+    const bunkerCards = document.getElementById('bunkerCards');
+    const bunkerInfoPanels = document.getElementById('bunkerInfoPanels');
+
+    async function fetchBunkerCards() {
+      try {
+        const res = await fetch('/api/game/bunker');
+        const data = await res.json();
+        bunkerCards.innerHTML = '';
+        data.forEach(card => {
+          const div = document.createElement('div');
+          div.className = 'card-item';
+          div.innerHTML = `
+            <div class="card-title">${card.title}</div>
+            <div class="card-value">${card.value}</div>
+          `;
+          bunkerCards.appendChild(div);
+        });
+      } catch(e) {
+        bunkerCards.innerHTML = '<p style="color:#667;">⚠️ Ошибка загрузки</p>';
+      }
+    }
+
+    async function fetchCatastrophe() {
+      const res = await fetch('/api/catastrophe');
+      const data = await res.json();
+      bunkerInfoPanels.innerHTML = `
+        <div class="info-panel"><h4>🌪️ Катастрофа</h4><span class="info-chip"><span class="label">${data.catastrophe}</span></span></div>
+      `;
+    }
+
+    async function fetchBunkerContents() {
+      const res = await fetch('/api/bunker');
+      const data = await res.json();
+      let html = '<div class="info-panel"><h4>📦 Содержимое</h4>';
+      data.forEach(item => {
+        html += `<span class="info-chip"><span class="label">${item.item}:</span> ${item.amount}</span>`;
+      });
+      html += '</div>';
+      bunkerInfoPanels.innerHTML = html;
+    }
+
+    document.getElementById('bunkerStartBtn').addEventListener('click', fetchBunkerCards);
+    document.getElementById('bunkerRestartBtn').addEventListener('click', () => {
+      bunkerCards.innerHTML = '';
+      bunkerInfoPanels.innerHTML = '';
     });
-    gameLog.scrollTop = gameLog.scrollHeight;
-  }
+    document.getElementById('bunkerCatastropheBtn').addEventListener('click', fetchCatastrophe);
+    document.getElementById('bunkerContentsBtn').addEventListener('click', fetchBunkerContents);
 
-  function renderActionArea(data) {
-    actionArea.innerHTML = '';
-    if (data.gameType === 'mafia') {
-      if (data.phase === 'night') {
-        const role = data.roles ? data.roles[socket.id] : '';
-        if (role === 'Мафия') {
-          const alivePlayers = data.alive || [];
-          if (alivePlayers.length > 0) {
+    // --- ОНЛАЙН (МАФИЯ / ШПИОН) ---
+    const socket = io();
+
+    const lobbyScreen = document.getElementById('lobbyScreen');
+    const roomScreen = document.getElementById('roomScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+    const playersCountDisplay = document.getElementById('playersCountDisplay');
+    const playerList = document.getElementById('playerList');
+    const gameLog = document.getElementById('gameLog');
+    const phaseDisplay = document.getElementById('phaseDisplay');
+    const myRoleDisplay = document.getElementById('myRoleDisplay');
+    const actionArea = document.getElementById('actionArea');
+    const onlineError = document.getElementById('onlineError');
+
+    const playerNameInput = document.getElementById('playerNameInput');
+    const roomCodeInput = document.getElementById('roomCodeInput');
+
+    let currentRoom = null;
+    let isHost = false;
+
+    function showOnlineError(msg) {
+      onlineError.textContent = msg;
+      setTimeout(() => onlineError.textContent = '', 5000);
+    }
+
+    function updatePlayerList(players) {
+      playerList.innerHTML = '';
+      players.forEach(p => {
+        const chip = document.createElement('span');
+        chip.className = 'player-chip' + (p.isHost ? ' host' : '');
+        chip.textContent = p.name + (p.isHost ? ' 👑' : '');
+        playerList.appendChild(chip);
+      });
+      playersCountDisplay.textContent = `Игроков: ${players.length}`;
+    }
+
+    function updateGameLog(entries) {
+      gameLog.innerHTML = '';
+      entries.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.textContent = entry;
+        gameLog.appendChild(div);
+      });
+      gameLog.scrollTop = gameLog.scrollHeight;
+    }
+
+    function renderActionArea(data) {
+      actionArea.innerHTML = '';
+      const gameType = data.gameType || 'mafia';
+      if (gameType === 'mafia') {
+        if (data.phase === 'night') {
+          const role = data.roles ? data.roles[socket.id] : '';
+          if (role === 'Мафия') {
+            const alive = data.alive || [];
+            if (alive.length > 0) {
+              const select = document.createElement('select');
+              select.id = 'mafiaTarget';
+              alive.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                select.appendChild(opt);
+              });
+              const btn = document.createElement('button');
+              btn.className = 'btn btn-danger btn-small';
+              btn.textContent = '🔪 Убить';
+              btn.addEventListener('click', () => {
+                const target = select.value;
+                if (target) {
+                  socket.emit('nightVote', { roomCode: currentRoom, targetPlayerName: target });
+                  actionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
+                }
+              });
+              actionArea.appendChild(select);
+              actionArea.appendChild(btn);
+            }
+          } else {
+            actionArea.innerHTML = '<p style="color:#aab;">🌙 Город засыпает... Ожидайте утра.</p>';
+          }
+        } else if (data.phase === 'day') {
+          const alive = data.alive || [];
+          if (alive.length > 0) {
             const select = document.createElement('select');
-            select.id = 'mafiaTarget';
-            alivePlayers.forEach(name => {
+            select.id = 'dayTarget';
+            alive.forEach(name => {
               const opt = document.createElement('option');
               opt.value = name;
               opt.textContent = name;
               select.appendChild(opt);
             });
             const btn = document.createElement('button');
-            btn.className = 'btn btn-danger btn-small';
-            btn.textContent = '🔪 Убить';
+            btn.className = 'btn btn-secondary btn-small';
+            btn.textContent = '🗳️ Голосовать';
             btn.addEventListener('click', () => {
               const target = select.value;
               if (target) {
-                socket.emit('nightVote', { roomCode: currentRoom, targetPlayerName: target });
+                socket.emit('dayVote', { roomCode: currentRoom, targetPlayerName: target });
                 actionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
               }
             });
             actionArea.appendChild(select);
             actionArea.appendChild(btn);
           }
-        } else {
-          actionArea.innerHTML = '<p style="color:#aab;">🌙 Город засыпает... Ожидайте утра.</p>';
         }
-      } else if (data.phase === 'day') {
-        const alivePlayers = data.alive || [];
-        if (alivePlayers.length > 0) {
+      } else if (gameType === 'spy') {
+        const alive = data.alive || [];
+        if (alive.length > 0) {
           const select = document.createElement('select');
-          select.id = 'dayTarget';
-          alivePlayers.forEach(name => {
+          select.id = 'spyTarget';
+          alive.forEach(name => {
             const opt = document.createElement('option');
             opt.value = name;
             opt.textContent = name;
@@ -426,7 +463,7 @@
           });
           const btn = document.createElement('button');
           btn.className = 'btn btn-secondary btn-small';
-          btn.textContent = '🗳️ Голосовать';
+          btn.textContent = '🕵️ Указать на шпиона';
           btn.addEventListener('click', () => {
             const target = select.value;
             if (target) {
@@ -438,32 +475,99 @@
           actionArea.appendChild(btn);
         }
       }
-    } else if (data.gameType === 'spy') {
-      const alivePlayers = data.alive || [];
-      if (alivePlayers.length > 0) {
-        const select = document.createElement('select');
-        select.id = 'spyTarget';
-        alivePlayers.forEach(name => {
-          const opt = document.createElement('option');
-          opt.value = name;
-          opt.textContent = name;
-          select.appendChild(opt);
-        });
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-secondary btn-small';
-        btn.textContent = '🕵️ Указать на шпиона';
-        btn.addEventListener('click', () => {
-          const target = select.value;
-          if (target) {
-            socket.emit('dayVote', { roomCode: currentRoom, targetPlayerName: target });
-            actionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
-          }
-        });
-        actionArea.appendChild(select);
-        actionArea.appendChild(btn);
-      }
     }
-  }
+
+    function leaveRoom() {
+      socket.disconnect();
+      socket.connect();
+      lobbyScreen.classList.remove('hidden');
+      roomScreen.classList.add('hidden');
+      gameScreen.classList.add('hidden');
+      currentRoom = null;
+    }
+
+    // --- SOCKET ОБРАБОТЧИКИ ---
+    socket.on('roomCreated', (data) => {
+      currentRoom = data.roomCode;
+      isHost = true;
+      lobbyScreen.classList.add('hidden');
+      roomScreen.classList.remove('hidden');
+      roomCodeDisplay.textContent = data.roomCode;
+    });
+
+    socket.on('joinedRoom', (data) => {
+      currentRoom = data.roomCode;
+      isHost = false;
+      lobbyScreen.classList.add('hidden');
+      roomScreen.classList.remove('hidden');
+      roomCodeDisplay.textContent = data.roomCode;
+    });
+
+    socket.on('playersUpdate', (players) => {
+      updatePlayerList(players);
+    });
+
+    socket.on('gameStarted', (data) => {
+      roomScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      phaseDisplay.textContent = data.phase === 'night' ? '🌙 Ночь' : '☀️ День';
+      const role = data.roles ? data.roles[socket.id] : '???';
+      myRoleDisplay.textContent = role;
+      if (data.gameType === 'spy' && data.location) {
+        myRoleDisplay.textContent += ` | Локация: ${data.location}`;
+      }
+      updateGameLog(data.log || []);
+      renderActionArea(data);
+    });
+
+    socket.on('phaseUpdate', (data) => {
+      phaseDisplay.textContent = data.phase === 'night' ? '🌙 Ночь' : '☀️ День';
+      if (data.log) updateGameLog(data.log);
+    });
+
+    socket.on('nightResult', (data) => {
+      updateGameLog([`🌙 Мафия выбрала ${data.kill}`]);
+    });
+
+    socket.on('dayResult', (data) => {
+      updateGameLog([`☀️ Игрок ${data.eliminated} выгнан!`]);
+    });
+
+    socket.on('gameEnded', (data) => {
+      updateGameLog([`🏆 Победили: ${data.winner}!`]);
+      phaseDisplay.textContent = `🏆 Игра окончена! Победили: ${data.winner}`;
+      actionArea.innerHTML = '<p style="color:#f5c542;">Игра завершена. Нажмите "Выйти".</p>';
+    });
+
+    socket.on('error', (msg) => {
+      showOnlineError(msg);
+    });
+
+    // --- КНОПКИ ---
+    document.getElementById('createRoomBtn').addEventListener('click', () => {
+      const name = playerNameInput.value.trim() || 'Игрок';
+      const gameType = document.getElementById('onlineGameType').textContent.includes('Мафия') ? 'mafia' : 'spy';
+      socket.emit('createRoom', { playerName: name, gameType });
+    });
+
+    document.getElementById('joinRoomBtn').addEventListener('click', () => {
+      const name = playerNameInput.value.trim() || 'Игрок';
+      const code = roomCodeInput.value.trim().toUpperCase();
+      if (!code) { showOnlineError('Введите код комнаты'); return; }
+      socket.emit('joinRoom', { roomCode: code, playerName: name });
+    });
+
+    document.getElementById('startGameBtn').addEventListener('click', () => {
+      if (currentRoom) socket.emit('startGame', currentRoom);
+    });
+
+    document.getElementById('leaveRoomBtn').addEventListener('click', leaveRoom);
+    document.getElementById('leaveGameBtn').addEventListener('click', leaveRoom);
+
+    // --- ПРИ ЗАГРУЗКЕ ---
+    switchGame('bunker');
+    fetchBunkerCards();
+  })();
 </script>
 </body>
 </html>
