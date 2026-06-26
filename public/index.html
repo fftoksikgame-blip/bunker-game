@@ -100,6 +100,56 @@
     .game-btn:hover { border-color: #f5c542; box-shadow: 0 0 30px #f5c54222; }
     .game-btn.active { background: #f5c542; color: #0a0e14; border-color: #f5c542; }
 
+    .cards-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin: 12px 0;
+    }
+    .card-item {
+      background: #141c24;
+      border-left: 6px solid #f5c542;
+      border-radius: 14px;
+      padding: 14px 18px;
+      flex: 1 1 180px;
+      max-width: 230px;
+      min-width: 150px;
+      text-align: center;
+      box-shadow: 0 8px 30px #00000099;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .card-item:hover { transform: translateY(-4px); border-color: #ffa500; }
+    .card-item .card-title { font-size: 0.6rem; text-transform: uppercase; color: #f5c542; }
+    .card-item .card-value { font-size: 1.1rem; font-weight: 600; color: #f0f0f0; }
+    .card-item .card-desc { font-size: 0.7rem; color: #8899aa; margin-top: 4px; font-style: italic; }
+
+    .info-panels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin: 10px 0;
+    }
+    .info-panel {
+      background: #101820;
+      border: 1px solid #1a2a3a;
+      border-radius: 16px;
+      padding: 12px 18px;
+      flex: 1;
+    }
+    .info-panel h4 { color: #f5c542; font-weight: 400; margin-bottom: 6px; }
+    .info-chip {
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      border-radius: 30px;
+      padding: 4px 14px;
+      display: inline-block;
+      margin: 3px;
+      font-size: 0.85rem;
+    }
+    .info-chip .label { color: #f5c542; font-weight: 600; }
+
     .player-list {
       display: flex;
       flex-wrap: wrap;
@@ -138,55 +188,6 @@
     }
     .role-reveal .role { color: #f5c542; font-weight: 700; }
 
-    .cards-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 14px;
-      margin: 12px 0;
-    }
-    .card-item {
-      background: #141c24;
-      border-left: 6px solid #f5c542;
-      border-radius: 14px;
-      padding: 14px 18px;
-      flex: 1 1 180px;
-      max-width: 230px;
-      min-width: 150px;
-      text-align: center;
-      box-shadow: 0 8px 30px #00000099;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .card-item:hover { transform: translateY(-4px); border-color: #ffa500; }
-    .card-item .card-title { font-size: 0.6rem; text-transform: uppercase; color: #f5c542; }
-    .card-item .card-value { font-size: 1.1rem; font-weight: 600; color: #f0f0f0; }
-
-    .info-panels {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin: 10px 0;
-    }
-    .info-panel {
-      background: #101820;
-      border: 1px solid #1a2a3a;
-      border-radius: 16px;
-      padding: 12px 18px;
-      flex: 1;
-    }
-    .info-panel h4 { color: #f5c542; font-weight: 400; margin-bottom: 6px; }
-    .info-chip {
-      background: #0a141c;
-      border: 1px solid #1a2a3a;
-      border-radius: 30px;
-      padding: 4px 14px;
-      display: inline-block;
-      margin: 3px;
-      font-size: 0.85rem;
-    }
-    .info-chip .label { color: #f5c542; font-weight: 600; }
-
     @media (max-width: 600px) {
       .header h1 { font-size: 1.8rem; }
       .game-btn { font-size: 0.8rem; padding: 8px 16px; }
@@ -196,7 +197,7 @@
 </head>
 <body>
 
-<div class="app" id="app">
+<div class="app">
   <div class="header">
     <h1>🎮 Игровой портал</h1>
     <div class="sub">Бункер · Мафия · Шпион</div>
@@ -209,7 +210,7 @@
     <button class="game-btn" data-game="spy">🕵️ Шпион</button>
   </div>
 
-  <!-- БУНКЕР (ОФЛАЙН) -->
+  <!-- БУНКЕР -->
   <div id="bunkerSection">
     <div class="card">
       <h2>🏚️ Бункер</h2>
@@ -224,7 +225,7 @@
     </div>
   </div>
 
-  <!-- МАФИЯ / ШПИОН (ОНЛАЙН) -->
+  <!-- ОНЛАЙН -->
   <div id="onlineSection" class="hidden">
     <div id="lobbyScreen" class="card">
       <h2>🏠 Вход в игру</h2>
@@ -271,13 +272,8 @@
     const bunkerSection = document.getElementById('bunkerSection');
     const onlineSection = document.getElementById('onlineSection');
 
-    let currentGame = 'bunker';
-
     function switchGame(game) {
-      currentGame = game;
-      gameBtns.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.game === game);
-      });
+      gameBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.game === game));
       if (game === 'bunker') {
         bunkerSection.classList.remove('hidden');
         onlineSection.classList.add('hidden');
@@ -289,29 +285,32 @@
     }
 
     gameBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        switchGame(btn.dataset.game);
-      });
+      btn.addEventListener('click', () => switchGame(btn.dataset.game));
     });
 
-    // --- БУНКЕР (ОФЛАЙН) ---
+    // --- БУНКЕР ---
     const bunkerCards = document.getElementById('bunkerCards');
     const bunkerInfoPanels = document.getElementById('bunkerInfoPanels');
+
+    function renderBunkerCards(cards) {
+      bunkerCards.innerHTML = '';
+      cards.forEach(card => {
+        const div = document.createElement('div');
+        div.className = 'card-item';
+        div.innerHTML = `
+          <div class="card-title">${card.title}</div>
+          <div class="card-value">${card.value}</div>
+          ${card.desc ? `<div class="card-desc">${card.desc}</div>` : ''}
+        `;
+        bunkerCards.appendChild(div);
+      });
+    }
 
     async function fetchBunkerCards() {
       try {
         const res = await fetch('/api/game/bunker');
         const data = await res.json();
-        bunkerCards.innerHTML = '';
-        data.forEach(card => {
-          const div = document.createElement('div');
-          div.className = 'card-item';
-          div.innerHTML = `
-            <div class="card-title">${card.title}</div>
-            <div class="card-value">${card.value}</div>
-          `;
-          bunkerCards.appendChild(div);
-        });
+        renderBunkerCards(data);
       } catch(e) {
         bunkerCards.innerHTML = '<p style="color:#667;">⚠️ Ошибка загрузки</p>';
       }
@@ -344,7 +343,7 @@
     document.getElementById('bunkerCatastropheBtn').addEventListener('click', fetchCatastrophe);
     document.getElementById('bunkerContentsBtn').addEventListener('click', fetchBunkerContents);
 
-    // --- ОНЛАЙН (МАФИЯ / ШПИОН) ---
+    // --- ОНЛАЙН (Socket.IO) ---
     const socket = io();
 
     const lobbyScreen = document.getElementById('lobbyScreen');
@@ -486,7 +485,6 @@
       currentRoom = null;
     }
 
-    // --- SOCKET ОБРАБОТЧИКИ ---
     socket.on('roomCreated', (data) => {
       currentRoom = data.roomCode;
       isHost = true;
@@ -503,9 +501,7 @@
       roomCodeDisplay.textContent = data.roomCode;
     });
 
-    socket.on('playersUpdate', (players) => {
-      updatePlayerList(players);
-    });
+    socket.on('playersUpdate', updatePlayerList);
 
     socket.on('gameStarted', (data) => {
       roomScreen.classList.add('hidden');
@@ -539,11 +535,8 @@
       actionArea.innerHTML = '<p style="color:#f5c542;">Игра завершена. Нажмите "Выйти".</p>';
     });
 
-    socket.on('error', (msg) => {
-      showOnlineError(msg);
-    });
+    socket.on('error', showOnlineError);
 
-    // --- КНОПКИ ---
     document.getElementById('createRoomBtn').addEventListener('click', () => {
       const name = playerNameInput.value.trim() || 'Игрок';
       const gameType = document.getElementById('onlineGameType').textContent.includes('Мафия') ? 'mafia' : 'spy';
@@ -564,7 +557,7 @@
     document.getElementById('leaveRoomBtn').addEventListener('click', leaveRoom);
     document.getElementById('leaveGameBtn').addEventListener('click', leaveRoom);
 
-    // --- ПРИ ЗАГРУЗКЕ ---
+    // --- ЗАПУСК ---
     switchGame('bunker');
     fetchBunkerCards();
   })();
