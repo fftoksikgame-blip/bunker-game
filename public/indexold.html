@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Игровой портал</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: #0a0e14;
+      background-image: radial-gradient(circle at 20% 30%, #1a2a3a, #05080a);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      color: #e8e8e8;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .portal {
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    /* ХЕДЕР */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 10px 0;
+      border-bottom: 1px solid #1a2a3a;
+    }
+    .header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f5c542, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+    }
+    .header .sub {
+      color: #8899aa;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    /* ВЫБОР ИГРЫ */
+    .game-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .game-btn {
+      background: #141c24;
+      border: 1px solid #2a3a4a;
+      color: #c0d0e0;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .game-btn:hover {
+      transform: translateY(-2px);
+      border-color: #f5c542;
+      box-shadow: 0 0 30px #f5c54222;
+    }
+    .game-btn.active {
+      background: #f5c542;
+      color: #0a0e14;
+      border-color: #f5c542;
+      box-shadow: 0 0 40px #f5c54244;
+    }
+
+    /* КНОПКИ ДЕЙСТВИЙ */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .btn {
+      background: #f5c542;
+      border: none;
+      color: #0a0e14;
+      font-weight: 700;
+      padding: 12px 32px;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.15s;
+      font-size: 1rem;
+      box-shadow: 0 0 30px #f5c54244;
+    }
+    .btn:active { transform: scale(0.94); }
+    .btn-secondary { background: #1a2a3a; color: #c0d0e0; box-shadow: none; }
+    .btn-secondary:hover { background: #2a3a4a; }
+    .btn-outline { background: transparent; border: 1px solid #f5c542; color: #f5c542; box-shadow: none; }
+    .btn-outline:hover { background: #f5c54222; }
+    .btn-danger { background: #6a1a1a; color: #ff8888; box-shadow: none; }
+    .btn-small { font-size: 0.8rem; padding: 6px 16px; }
+    .btn-green { background: #1a5a2a; color: #7aff7a; box-shadow: none; }
+    .hidden { display: none !important; }
+
+    /* КАРТЫ */
+    .cards-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      width: 100%;
+      margin: 12px 0;
+    }
+    .card {
+      background: #141c24;
+      border-left: 6px solid #f5c542;
+      border-radius: 14px;
+      padding: 14px 18px;
+      flex: 1 1 180px;
+      max-width: 230px;
+      min-width: 150px;
+      box-shadow: 0 8px 30px #00000099;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 110px;
+      cursor: pointer;
+      transition: 0.2s;
+      user-select: none;
+    }
+    .card:hover { transform: translateY(-4px); border-color: #ffa500; }
+    .card .card-title {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #f5c542;
+      margin-bottom: 4px;
+    }
+    .card .card-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f0f0f0;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+    .card .card-status {
+      font-size: 0.55rem;
+      color: #667;
+      margin-top: 6px;
+    }
+    .card.revealed { border-color: #7aff7a; background: #1a2a1a; }
+    .card.revealed .card-status { color: #7aff7a; }
+    .card.hidden-card { border-color: #555; opacity: 0.5; }
+    .card.hidden-card .card-value { color: #889; }
+
+    /* ПАНЕЛИ */
+    .info-panels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      width: 100%;
+      margin: 6px 0 12px 0;
+    }
+    .info-panel {
+      background: #101820;
+      border: 1px solid #1a2a3a;
+      border-radius: 16px;
+      padding: 12px 18px;
+      flex: 1 1 280px;
+      max-width: 400px;
+      min-width: 200px;
+    }
+    .info-panel h4 {
+      color: #f5c542;
+      font-weight: 400;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #1a2a3a;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+    }
+    .info-chip {
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      border-radius: 30px;
+      padding: 4px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #e8e8e8;
+      margin: 3px;
+    }
+    .info-chip .label { color: #f5c542; font-weight: 600; }
+    .info-chip .value { color: #f0f0f0; font-weight: 500; }
+    .info-empty { color: #556; font-style: italic; font-size: 0.85rem; padding: 4px 0; }
+
+    /* БЛОКНОТ */
+    .notebook {
+      background: #101820;
+      border: 1px solid #1a2a3a;
+      border-radius: 16px;
+      padding: 14px 18px;
+      width: 100%;
+      max-width: 1000px;
+      margin: 12px 0;
+    }
+    .notebook-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 1px solid #1a2a3a;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    .notebook-header h3 { color: #f5c542; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.5px; }
+    .notebook-header .badge { background: #1a2a3a; padding: 3px 14px; border-radius: 30px; font-size: 0.75rem; color: #aab; }
+
+    .player-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .player-tab {
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      padding: 4px 14px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: 0.1s;
+      color: #aab;
+    }
+    .player-tab.active { background: #f5c542; color: #0a0e14; border-color: #f5c542; }
+    .player-tab:hover { border-color: #f5c542; }
+
+    .add-player-form {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .add-player-form input {
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      color: #e8e8e8;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      outline: none;
+      width: 140px;
+    }
+    .add-player-form input:focus { border-color: #f5c542; }
+
+    .manual-add {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: #0a141c;
+      padding: 8px 12px;
+      border-radius: 30px;
+      margin-bottom: 10px;
+      border: 1px solid #1a2a3a;
+    }
+    .manual-add select, .manual-add input {
+      background: #0a141c;
+      border: 1px solid #1a2a3a;
+      color: #e8e8e8;
+      padding: 5px 12px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      outline: none;
+    }
+    .manual-add select:focus, .manual-add input:focus { border-color: #f5c542; }
+    .manual-add input { flex: 1; min-width: 100px; }
+
+    .notebook-entries { max-height: 280px; overflow-y: auto; }
+    .notebook-entry {
+      background: #0a141c;
+      padding: 4px 12px;
+      border-radius: 6px;
+      margin: 3px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      border-left: 3px solid #f5c542;
+    }
+    .notebook-entry .entry-label { color: #f5c542; font-weight: 600; min-width: 70px; }
+    .notebook-entry .entry-value { color: #e8e8e8; flex: 1; margin: 0 8px; cursor: pointer; }
+    .notebook-entry .entry-actions button { background: none; border: none; color: #667; cursor: pointer; font-size: 0.7rem; }
+    .notebook-entry .entry-actions button:hover { color: #ff6666; }
+    .notebook-entry .entry-count {
+      background: #1a2a3a;
+      padding: 0 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      color: #aab;
+      margin-left: 6px;
+    }
+    .notebook-empty { color: #556; font-style: italic; text-align: center; padding: 10px 0; font-size: 0.9rem; }
+
+    /* ИНСТРУКЦИИ ДЛЯ ИГР */
+    .game-rules {
+      background: #101820;
+      border: 1px solid #1a2a3a;
+      border-radius: 16px;
+      padding: 12px 18px;
+      margin: 8px 0 12px 0;
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+      color: #aab;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .game-rules strong { color: #f5c542; }
+
+    .footer {
+      margin-top: 20px;
+      padding: 10px 0;
+      width: 100%;
+      text-align: center;
+      border-top: 1px solid #1a2a3a;
+      color: #445;
+      font-size: 0.7rem;
+    }
+    .footer span { color: #667; font-weight: 400; }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 2rem; }
+      .game-btn { font-size: 0.8rem; padding: 8px 16px; }
+      .btn { font-size: 0.9rem; padding: 10px 20px; }
+      .card { flex: 1 1 100%; max-width: 100%; min-height: 80px; }
+      .card .card-value { font-size: 0.9rem; }
+      .info-panel { flex: 1 1 100%; max-width: 100%; }
+      .manual-add { flex-direction: column; align-items: stretch; }
+      .game-rules { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="portal">
+  <!-- ХЕДЕР -->
+  <div class="header">
+    <h1>🎮 ИГРОВОЙ ПОРТАЛ</h1>
+    <div class="sub">Выбери игру, добавь игроков и начинай</div>
+  </div>
+
+  <!-- ВЫБОР ИГРЫ -->
+  <div class="game-selector">
+    <button class="game-btn active" data-game="bunker">🏚️ Бункер</button>
+    <button class="game-btn" data-game="mafia">🔪 Мафия</button>
+    <button class="game-btn" data-game="spy">🕵️ Шпион</button>
+  </div>
+
+  <!-- ПРАВИЛА (динамические) -->
+  <div class="game-rules" id="gameRules">
+    <strong>🏚️ Бункер:</strong> 8–9 карт (профессия, возраст, факт, хобби, багаж, здоровье, характер, фобия, условие). Голосуйте, кого выгнать из бункера!
+  </div>
+
+  <!-- КНОПКИ ДЕЙСТВИЙ -->
+  <div class="action-bar">
+    <button class="btn" id="startBtn">▶ НАЧАТЬ</button>
+    <button class="btn btn-secondary hidden" id="restartBtn">⟳ НАЧАТЬ ЗАНОВО</button>
+    <button class="btn btn-outline" id="catastropheBtn">🌪️ Эпидемия</button>
+    <button class="btn btn-outline" id="bunkerBtn">📦 Бункер</button>
+  </div>
+
+  <!-- ПАНЕЛИ -->
+  <div class="info-panels">
+    <div class="info-panel" id="catastrophePanel">
+      <h4>🌪️ Катастрофа / Эпидемия</h4>
+      <div class="chip-container" id="catastropheContent"><span class="info-empty">Не выбрана</span></div>
+    </div>
+    <div class="info-panel" id="bunkerPanel">
+      <h4>📦 Содержимое бункера</h4>
+      <div class="chip-container" id="bunkerContent"><span class="info-empty">Не загружено</span></div>
+    </div>
+  </div>
+
+  <!-- КАРТЫ -->
+  <div class="cards-grid" id="cardsContainer"></div>
+
+  <!-- БЛОКНОТ -->
+  <div class="notebook">
+    <div class="notebook-header">
+      <h3>📓 Блокнот</h3>
+      <span class="badge" id="notebookCount">0 игроков</span>
+    </div>
+
+    <div class="add-player-form">
+      <input type="text" id="newPlayerInput" placeholder="Имя игрока" value="Игрок 1">
+      <button class="btn btn-secondary btn-small" id="addPlayerBtn">➕ Добавить</button>
+      <button class="btn btn-danger btn-small" id="removePlayerBtn" style="display:none;">✖ Удалить</button>
+    </div>
+
+    <div class="player-tabs" id="playerTabs"></div>
+
+    <div class="manual-add">
+      <select id="manualCategory">
+        <option value="Профессия">Профессия</option>
+        <option value="Возраст">Возраст</option>
+        <option value="Факт">Факт</option>
+        <option value="Хобби">Хобби</option>
+        <option value="Багаж">Багаж</option>
+        <option value="Здоровье">Здоровье</option>
+        <option value="Характер">Характер</option>
+        <option value="Фобия">Фобия</option>
+        <option value="Условие">Условие</option>
+        <option value="Роль">Роль</option>
+        <option value="Локация">Локация</option>
+        <option value="Другое">Другое</option>
+      </select>
+      <input type="text" id="manualValue" placeholder="Что выпало игроку?">
+      <button class="btn btn-green btn-small" id="manualAddBtn">➕ Добавить</button>
+    </div>
+
+    <div class="notebook-entries" id="notebookEntries">
+      <div class="notebook-empty">Выберите игрока</div>
+    </div>
+
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-secondary btn-small" id="clearNotebookBtn">🧹 Очистить всё</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Спортивный плейбой, филантроп, величайший гений — Тимур</span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // --- DOM ---
+    const container = document.getElementById('cardsContainer');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const catastropheBtn = document.getElementById('catastropheBtn');
+    const bunkerBtn = document.getElementById('bunkerBtn');
+    const catastropheContent = document.getElementById('catastropheContent');
+    const bunkerContent = document.getElementById('bunkerContent');
+    const gameRules = document.getElementById('gameRules');
+
+    const playerTabs = document.getElementById('playerTabs');
+    const notebookEntries = document.getElementById('notebookEntries');
+    const notebookCount = document.getElementById('notebookCount');
+    const newPlayerInput = document.getElementById('newPlayerInput');
+    const addPlayerBtn = document.getElementById('addPlayerBtn');
+    const removePlayerBtn = document.getElementById('removePlayerBtn');
+    const clearNotebookBtn = document.getElementById('clearNotebookBtn');
+    const manualCategory = document.getElementById('manualCategory');
+    const manualValue = document.getElementById('manualValue');
+    const manualAddBtn = document.getElementById('manualAddBtn');
+
+    const gameBtns = document.querySelectorAll('.game-btn');
+
+    // --- Состояние ---
+    let currentGame = 'bunker';
+    let currentCards = [];
+    let currentPlayer = '';
+    let allPlayers = [];
+    const STORAGE_KEY = 'portal_data';
+
+    // --- Правила ---
+    const rules = {
+      bunker: '<strong>🏚️ Бункер:</strong> 8–9 карт (профессия, возраст, факт, хобби, багаж, здоровье, характер, фобия, условие). Голосуйте, кого выгнать из бункера!',
+      mafia: '<strong>🔪 Мафия:</strong> Мирные, мафия, шериф, доктор. Ночью мафия убивает, днём все голосуют. Шериф проверяет, доктор лечит.',
+      spy: '<strong>🕵️ Шпион:</strong> Один игрок — шпион (не знает локацию). Остальные знают локацию. Обсуждайте 5 минут, шпион должен угадать или остаться незамеченным.'
+    };
+
+    // --- localStorage ---
+    function loadState() {
+      try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return null; const data = JSON.parse(raw); if (data.cards && data.players && data.notebook) return data; return null; } catch { return null; }
+    }
+    function saveState() {
+      const notebook = getNotebook();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ cards: currentCards, players: allPlayers, notebook, currentPlayer, game: currentGame }));
+    }
+    function getNotebook() {
+      try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return {}; const data = JSON.parse(raw); return data.notebook || {}; } catch { return {}; }
+    }
+    function saveNotebook(notebook) {
+      const state = loadState() || { cards: [], players: [], notebook: {}, currentPlayer: '', game: 'bunker' };
+      state.notebook = notebook;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function getPlayerEntries(playerName) {
+      const notebook = getNotebook();
+      return notebook[playerName] || [];
+    }
+    function setPlayerEntries(playerName, entries) {
+      const notebook = getNotebook();
+      notebook[playerName] = entries;
+      saveNotebook(notebook);
+    }
+    function addEntryToPlayer(playerName, title, value) {
+      const entries = getPlayerEntries(playerName);
+      const existing = entries.find(e => e.title === title && e.value === value);
+      if (existing) { existing.count = (existing.count || 1) + 1; }
+      else { entries.push({ title, value, count: 1 }); }
+      setPlayerEntries(playerName, entries);
+    }
+    function deleteEntryFromPlayer(playerName, index) {
+      const entries = getPlayerEntries(playerName);
+      if (entries[index].count > 1) { entries[index].count -= 1; }
+      else { entries.splice(index, 1); }
+      setPlayerEntries(playerName, entries);
+    }
+    function clearPlayerEntries(playerName) {
+      setPlayerEntries(playerName, []);
+    }
+
+    // --- Переключение игры ---
+    function switchGame(game) {
+      currentGame = game;
+      gameBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.game === game);
+      });
+      gameRules.innerHTML = rules[game] || rules.bunker;
+      currentCards = [];
+      container.innerHTML = '';
+      startBtn.classList.remove('hidden');
+      restartBtn.classList.add('hidden');
+      catastropheContent.innerHTML = '<span class="info-empty">Не выбрана</span>';
+      bunkerContent.innerHTML = '<span class="info-empty">Не загружено</span>';
+      saveState();
+    }
+
+    // --- Рендер карт ---
+    function renderCards() {
+      container.innerHTML = '';
+      if (!currentCards || currentCards.length === 0) return;
+      currentCards.forEach((card) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        if (card.revealed) div.classList.add('revealed');
+        if (card.hidden) div.classList.add('hidden-card');
+        const displayValue = card.hidden ? '🔒 Скрыто' : (card.revealed ? card.value : '❓');
+        div.innerHTML = `
+          <div class="card-title">${card.title}</div>
+          <div class="card-value">${displayValue}</div>
+          <div class="card-status">${card.hidden ? '🔒 Скрыта' : (card.revealed ? '✓ Открыта' : '👆 Нажми')}</div>
+        `;
+        div.addEventListener('click', () => {
+          if (card.revealed) {
+            card.hidden = !card.hidden;
+          } else {
+            card.revealed = true;
+            card.hidden = false;
+            if (currentPlayer) addEntryToPlayer(currentPlayer, card.title, card.value);
+          }
+          renderCards();
+          renderNotebook();
+          saveState();
+        });
+        container.appendChild(div);
+      });
+    }
+
+    // --- Рендер блокнота ---
+    function renderNotebook() {
+      if (!currentPlayer) { notebookEntries.innerHTML = `<div class="notebook-empty">Выберите игрока</div>`; return; }
+      const entries = getPlayerEntries(currentPlayer);
+      if (entries.length === 0) { notebookEntries.innerHTML = `<div class="notebook-empty">У игрока "${currentPlayer}" пока нет карт</div>`; return; }
+      let html = '';
+      entries.forEach((e, index) => {
+        const countDisplay = e.count > 1 ? `<span class="entry-count">x${e.count}</span>` : '';
+        html += `
+          <div class="notebook-entry" data-index="${index}">
+            <span class="entry-label">${e.title}:</span>
+            <span class="entry-value" data-index="${index}">${e.value} ${countDisplay}</span>
+            <div class="entry-actions">
+              <button class="delete-entry" data-index="${index}" title="Удалить одну">✖</button>
+            </div>
+          </div>
+        `;
+      });
+      notebookEntries.innerHTML = html;
+      document.querySelectorAll('.delete-entry').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const index = parseInt(btn.dataset.index);
+          deleteEntryFromPlayer(currentPlayer, index);
+          renderNotebook();
+          saveState();
+        });
+      });
+      document.querySelectorAll('.entry-value').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const index = parseInt(this.dataset.index);
+          const entries = getPlayerEntries(currentPlayer);
+          const currentText = entries[index].value;
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = currentText;
+          input.style.width = 'auto';
+          input.style.minWidth = '100px';
+          input.style.background = '#0a141c';
+          input.style.color = '#e8e8e8';
+          input.style.border = '1px solid #f5c542';
+          input.style.borderRadius = '6px';
+          input.style.padding = '2px 8px';
+          input.style.fontSize = '0.9rem';
+          this.replaceWith(input);
+          input.focus();
+          input.select();
+          const saveEdit = () => {
+            const newValue = input.value.trim() || currentText;
+            const entries = getPlayerEntries(currentPlayer);
+            if (entries[index]) { entries[index].value = newValue; setPlayerEntries(currentPlayer, entries); }
+            renderNotebook(); saveState();
+          };
+          input.addEventListener('blur', saveEdit);
+          input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { input.blur(); } if (e.key === 'Escape') { input.value = currentText; input.blur(); } });
+        });
+      });
+    }
+
+    // --- Рендер вкладок ---
+    function renderTabs() {
+      if (allPlayers.length === 0) {
+        playerTabs.innerHTML = '<span style="color:#556;font-size:0.8rem;">Нет игроков. Добавьте!</span>';
+        notebookCount.textContent = '0 игроков';
+        removePlayerBtn.style.display = 'none';
+        return;
+      }
+      let html = '';
+      allPlayers.forEach(p => { const active = p === currentPlayer ? 'active' : ''; html += `<div class="player-tab ${active}" data-player="${p}">${p}</div>`; });
+      playerTabs.innerHTML = html;
+      notebookCount.textContent = `${allPlayers.length} игроков`;
+      removePlayerBtn.style.display = 'block';
+      document.querySelectorAll('.player-tab').forEach(tab => {
+        tab.addEventListener('click', () => { currentPlayer = tab.dataset.player; renderTabs(); renderNotebook(); saveState(); });
+      });
+    }
+
+    // --- Добавление/удаление игроков ---
+    function addPlayer() {
+      const name = newPlayerInput.value.trim();
+      if (!name) return;
+      if (allPlayers.includes(name)) { alert('Такой игрок уже есть'); return; }
+      allPlayers.push(name);
+      if (!currentPlayer) currentPlayer = name;
+      const notebook = getNotebook();
+      if (!notebook[name]) { notebook[name] = []; saveNotebook(notebook); }
+      newPlayerInput.value = '';
+      renderTabs(); renderNotebook(); saveState();
+    }
+    function removePlayer() {
+      if (!currentPlayer) return;
+      if (!confirm(`Удалить игрока "${currentPlayer}" и все его карты?`)) return;
+      const notebook = getNotebook();
+      delete notebook[currentPlayer];
+      saveNotebook(notebook);
+      allPlayers = allPlayers.filter(p => p !== currentPlayer);
+      if (allPlayers.length > 0) { currentPlayer = allPlayers[0]; } else { currentPlayer = ''; }
+      renderTabs(); renderNotebook(); saveState();
+    }
+
+    // --- Ручное добавление карты ---
+    function manualAddCard() {
+      if (!currentPlayer) { alert('Сначала выберите игрока'); return; }
+      const category = manualCategory.value;
+      const value = manualValue.value.trim();
+      if (!value) { alert('Введите значение карты'); return; }
+      addEntryToPlayer(currentPlayer, category, value);
+      manualValue.value = '';
+      renderNotebook(); saveState();
+    }
+
+    // --- Загрузка карт с сервера ---
+    async function fetchCards() {
+      try {
+        const count = allPlayers.length || 6;
+        const res = await fetch(`/api/game/${currentGame}?count=${count}`);
+        if (!res.ok) throw new Error('Ошибка сервера');
+        const raw = await res.json();
+        currentCards = raw.map(c => ({ title: c.title, value: c.value, revealed: false, hidden: false }));
+        renderCards();
+        startBtn.classList.add('hidden');
+        restartBtn.classList.remove('hidden');
+        saveState();
+      } catch(e) {
+        container.innerHTML = '<p style="color:#667;">⚠️ Ошибка загрузки</p>';
+        console.error(e);
+      }
+    }
+
+    // --- Сброс игры ---
+    function resetGame() {
+      currentCards = [];
+      container.innerHTML = '';
+      restartBtn.classList.add('hidden');
+      startBtn.classList.remove('hidden');
+      saveState();
+    }
+
+    // --- Очистка блокнота ---
+    function clearCurrentPlayerNotebook() {
+      if (!currentPlayer) return;
+      if (!confirm(`Очистить все карты для "${currentPlayer}"?`)) return;
+      clearPlayerEntries(currentPlayer);
+      renderNotebook(); saveState();
+    }
+
+    // --- Эпидемия ---
+    async function fetchCatastrophe() {
+      try {
+        const res = await fetch('/api/catastrophe');
+        if (!res.ok) throw new Error('Ошибка');
+        const data = await res.json();
+        catastropheContent.innerHTML = `<div class="info-chip"><span class="label">🌪️</span> <span class="value">${data.catastrophe}</span></div>`;
+      } catch(e) { catastropheContent.innerHTML = `<span class="info-empty">⚠️ Ошибка</span>`; }
+    }
+
+    // --- Бункер ---
+    async function fetchBunker() {
+      try {
+        const res = await fetch('/api/bunker');
+        if (!res.ok) throw new Error('Ошибка');
+        const data = await res.json();
+        let chips = '';
+        data.forEach(item => {
+          chips += `<div class="info-chip"><span class="label">${item.item}:</span> <span class="value">${item.amount}</span></div>`;
+        });
+        bunkerContent.innerHTML = chips || `<span class="info-empty">Пусто</span>`;
+      } catch(e) { bunkerContent.innerHTML = `<span class="info-empty">⚠️ Ошибка</span>`; }
+    }
+
+    // --- Восстановление состояния ---
+    function restoreState() {
+      const saved = loadState();
+      if (!saved) return false;
+      if (saved.game) switchGame(saved.game);
+      if (saved.cards && saved.cards.length > 0) {
+        currentCards = saved.cards;
+        renderCards();
+        startBtn.classList.add('hidden');
+        restartBtn.classList.remove('hidden');
+      }
+      if (saved.players && saved.players.length > 0) {
+        allPlayers = saved.players;
+        currentPlayer = saved.currentPlayer || allPlayers[0];
+        renderTabs(); renderNotebook();
+      }
+      return true;
+    }
+
+    // --- Обработчики ---
+    startBtn.addEventListener('click', fetchCards);
+    restartBtn.addEventListener('click', resetGame);
+    catastropheBtn.addEventListener('click', fetchCatastrophe);
+    bunkerBtn.addEventListener('click', fetchBunker);
+    addPlayerBtn.addEventListener('click', addPlayer);
+    newPlayerInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPlayer(); });
+    removePlayerBtn.addEventListener('click', removePlayer);
+    clearNotebookBtn.addEventListener('click', clearCurrentPlayerNotebook);
+    manualAddBtn.addEventListener('click', manualAddCard);
+    manualValue.addEventListener('keydown', (e) => { if (e.key === 'Enter') manualAddCard(); });
+
+    gameBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchGame(btn.dataset.game);
+      });
+    });
+
+    // --- Инициализация ---
+    const restored = restoreState();
+    if (!restored) {
+      allPlayers = ['Игрок 1'];
+      currentPlayer = 'Игрок 1';
+      const notebook = getNotebook();
+      if (!notebook['Игрок 1']) { notebook['Игрок 1'] = []; saveNotebook(notebook); }
+      renderTabs(); renderNotebook(); saveState();
+    }
+  })();
+</script>
+
+</body>
+</html>
