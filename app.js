@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // ============================================================
-// БУНКЕР — ДАННЫЕ С УНИКАЛЬНЫМИ ОПИСАНИЯМИ
+// БУНКЕР — ДАННЫЕ
 // ============================================================
 
 const ages = [];
@@ -327,7 +327,7 @@ app.get('/api/bunker', (req, res) => {
 });
 
 // ============================================================
-// МАФИЯ — РАСШИРЕННЫЕ РОЛИ (ДОН, ШЛЮХА, ДОКТОР, ШЕРИФ)
+// МАФИЯ — РАСШИРЕННЫЕ РОЛИ
 // ============================================================
 
 function generateMafiaRoles(playerCount) {
@@ -524,7 +524,7 @@ io.on('connection', (socket) => {
 });
 
 // ============================================================
-// ПРАВДА ИЛИ ДЕЙСТВИЕ
+// ПРАВДА ИЛИ ДЕЙСТВИЕ (РАВНЫЕ ШАНСЫ)
 // ============================================================
 
 const truthQuestions = [
@@ -589,18 +589,17 @@ const helpActions = [
 ];
 
 app.get('/api/truthordare', (req, res) => {
-  const roll = Math.random();
-  let result = { type: 'skip', message: '⏭️ Скип! Ничего не произошло.' };
-
-  if (roll < 0.05) {
-    const isTruth = Math.random() < 0.5;
-    if (isTruth) {
-      const question = random(truthQuestions);
-      result = { type: 'truth', message: `❓ Правда: ${question}` };
-    } else {
-      const action = random(dareActions);
-      result = { type: 'dare', message: `🎯 Действие: ${action}` };
-    }
+  const roll = Math.floor(Math.random() * 3); // 0, 1, 2
+  
+  let result;
+  if (roll === 0) {
+    const question = random(truthQuestions);
+    result = { type: 'truth', message: `❓ Правда: ${question}` };
+  } else if (roll === 1) {
+    const action = random(dareActions);
+    result = { type: 'dare', message: `🎯 Действие: ${action}` };
+  } else {
+    result = { type: 'skip', message: '⏭️ Скип! Ничего не произошло.' };
   }
 
   res.json(result);
@@ -624,5 +623,5 @@ app.get('/api/help', (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`[PORTAL] Запущен на порту ${PORT}`);
-  console.log(`[PORTAL] Игры: Бункер, Мафия (Дон, Шлюха), Шпион`);
+  console.log(`[PORTAL] Игры: Бункер, Мафия (Дон, Шлюха), Шпион, Правда/Действие`);
 });

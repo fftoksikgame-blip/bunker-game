@@ -35,7 +35,6 @@
     }
     .header .sub { color: #8899aa; font-size: 0.9rem; }
 
-    /* ВКЛАДКИ */
     .tabs {
       display: flex;
       flex-wrap: wrap;
@@ -57,12 +56,8 @@
     .tab-btn:hover { border-color: #f5c542; box-shadow: 0 0 30px #f5c54222; }
     .tab-btn.active { background: #f5c542; color: #0a0e14; border-color: #f5c542; }
 
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .card {
       background: #101820;
@@ -229,7 +224,6 @@
     <div class="sub">Выбери игру</div>
   </div>
 
-  <!-- ВКЛАДКИ -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="bunker">🏚️ Бункер</button>
     <button class="tab-btn" data-tab="mafia">🔪 Мафия</button>
@@ -238,7 +232,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- ВКЛАДКА: БУНКЕР -->
+  <!-- БУНКЕР -->
   <!-- ============================================================ -->
   <div id="tab-bunker" class="tab-content active">
     <div class="card">
@@ -266,7 +260,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- ВКЛАДКА: МАФИЯ -->
+  <!-- МАФИЯ -->
   <!-- ============================================================ -->
   <div id="tab-mafia" class="tab-content">
     <div id="mafiaLobby" class="card">
@@ -305,7 +299,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- ВКЛАДКА: ШПИОН -->
+  <!-- ШПИОН -->
   <!-- ============================================================ -->
   <div id="tab-spy" class="tab-content">
     <div id="spyLobby" class="card">
@@ -344,12 +338,12 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- ВКЛАДКА: ПРАВДА ИЛИ ДЕЙСТВИЕ -->
+  <!-- ПРАВДА ИЛИ ДЕЙСТВИЕ -->
   <!-- ============================================================ -->
   <div id="tab-truth" class="tab-content">
     <div class="card">
       <h2>🎲 Правда или Действие</h2>
-      <p style="color:#aab; margin-bottom:12px;">Нажми на кнопку — с 5% шансом выпадет Правда, Действие или Скип.</p>
+      <p style="color:#aab; margin-bottom:12px;">Нажми на кнопку — выпадет Правда, Действие или Скип (все с равным шансом).</p>
       <button class="btn" id="truthMainBtn">🎲 Крутить</button>
 
       <div id="truthResult" class="truth-result" style="display:none;">
@@ -445,7 +439,7 @@
     document.getElementById('bunkerContentsBtn').addEventListener('click', fetchBunkerContents);
 
     // ============================================================
-    // ПРАВДА ИЛИ ДЕЙСТВИЕ (ОТДЕЛЬНАЯ ИГРА)
+    // ПРАВДА ИЛИ ДЕЙСТВИЕ
     // ============================================================
     const truthMainBtn = document.getElementById('truthMainBtn');
     const truthResult = document.getElementById('truthResult');
@@ -478,7 +472,7 @@
     });
 
     // ============================================================
-    // МАФИЯ (ОТДЕЛЬНЫЙ SOCKET)
+    // МАФИЯ
     // ============================================================
     const mafiaSocket = io();
 
@@ -498,7 +492,6 @@
     const mafiaRoomCode = document.getElementById('mafiaRoomCode');
 
     let mafiaCurrentRoom = null;
-    let mafiaIsHost = false;
 
     function showMafiaError(msg) {
       mafiaError.textContent = msg;
@@ -596,7 +589,6 @@
 
     mafiaSocket.on('roomCreated', (data) => {
       mafiaCurrentRoom = data.roomCode;
-      mafiaIsHost = true;
       mafiaLobby.classList.add('hidden');
       mafiaRoom.classList.remove('hidden');
       mafiaRoomCodeDisplay.textContent = data.roomCode;
@@ -604,7 +596,6 @@
 
     mafiaSocket.on('joinedRoom', (data) => {
       mafiaCurrentRoom = data.roomCode;
-      mafiaIsHost = false;
       mafiaLobby.classList.add('hidden');
       mafiaRoom.classList.remove('hidden');
       mafiaRoomCodeDisplay.textContent = data.roomCode;
@@ -658,7 +649,7 @@
     document.getElementById('mafiaLeaveGameBtn').addEventListener('click', mafiaLeave);
 
     // ============================================================
-    // ШПИОН (ОТДЕЛЬНЫЙ SOCKET)
+    // ШПИОН
     // ============================================================
     const spySocket = io();
 
@@ -678,7 +669,6 @@
     const spyRoomCode = document.getElementById('spyRoomCode');
 
     let spyCurrentRoom = null;
-    let spyIsHost = false;
 
     function showSpyError(msg) {
       spyError.textContent = msg;
@@ -745,7 +735,6 @@
 
     spySocket.on('roomCreated', (data) => {
       spyCurrentRoom = data.roomCode;
-      spyIsHost = true;
       spyLobby.classList.add('hidden');
       spyRoom.classList.remove('hidden');
       spyRoomCodeDisplay.textContent = data.roomCode;
@@ -753,7 +742,6 @@
 
     spySocket.on('joinedRoom', (data) => {
       spyCurrentRoom = data.roomCode;
-      spyIsHost = false;
       spyLobby.classList.add('hidden');
       spyRoom.classList.remove('hidden');
       spyRoomCodeDisplay.textContent = data.roomCode;
