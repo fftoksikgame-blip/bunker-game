@@ -524,7 +524,7 @@ io.on('connection', (socket) => {
 });
 
 // ============================================================
-// ПРАВДА ИЛИ ДЕЙСТВИЕ (РАВНЫЕ ШАНСЫ)
+// ПРАВДА ИЛИ ДЕЙСТВИЕ (ТОЛЬКО ТИП, ЗАДАНИЕ ПО КНОПКЕ)
 // ============================================================
 
 const truthQuestions = [
@@ -589,15 +589,13 @@ const helpActions = [
 ];
 
 app.get('/api/truthordare', (req, res) => {
-  const roll = Math.floor(Math.random() * 3); // 0, 1, 2
+  const roll = Math.floor(Math.random() * 3);
   
   let result;
   if (roll === 0) {
-    const question = random(truthQuestions);
-    result = { type: 'truth', message: `❓ Правда: ${question}` };
+    result = { type: 'truth', message: '❓ Выпала ПРАВДА' };
   } else if (roll === 1) {
-    const action = random(dareActions);
-    result = { type: 'dare', message: `🎯 Действие: ${action}` };
+    result = { type: 'dare', message: '🎯 Выпало ДЕЙСТВИЕ' };
   } else {
     result = { type: 'skip', message: '⏭️ Скип! Ничего не произошло.' };
   }
@@ -610,10 +608,10 @@ app.get('/api/help', (req, res) => {
   let help;
   if (isTruth) {
     help = random(helpQuestions);
-    res.json({ type: 'truth', message: `❓ Помощь зала (Правда): ${help}` });
+    res.json({ message: `❓ Правда: ${help}` });
   } else {
     help = random(helpActions);
-    res.json({ type: 'dare', message: `🎯 Помощь зала (Действие): ${help}` });
+    res.json({ message: `🎯 Действие: ${help}` });
   }
 });
 

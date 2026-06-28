@@ -343,12 +343,12 @@
   <div id="tab-truth" class="tab-content">
     <div class="card">
       <h2>🎲 Правда или Действие</h2>
-      <p style="color:#aab; margin-bottom:12px;">Нажми на кнопку — выпадет Правда, Действие или Скип (все с равным шансом).</p>
+      <p style="color:#aab; margin-bottom:12px;">Нажми «Крутить» — выпадет тип (Правда, Действие или Скип).</p>
       <button class="btn" id="truthMainBtn">🎲 Крутить</button>
 
       <div id="truthResult" class="truth-result" style="display:none;">
         <span id="truthMessage"></span>
-        <button class="btn btn-secondary btn-small" id="truthHelpBtn" style="margin-left:10px;">🤝 Помощь зала</button>
+        <button class="btn btn-secondary btn-small" id="truthHelpBtn" style="margin-left:10px; display:none;">🤝 Помощь зала</button>
       </div>
     </div>
   </div>
@@ -452,7 +452,13 @@
         const data = await res.json();
         truthResult.style.display = 'block';
         truthMessage.textContent = data.message;
-        truthHelpBtn.style.display = data.type === 'skip' ? 'none' : 'inline-block';
+        
+        if (data.type === 'skip') {
+          truthHelpBtn.style.display = 'none';
+        } else {
+          truthHelpBtn.style.display = 'inline-block';
+          truthHelpBtn.dataset.type = data.type;
+        }
       } catch(e) {
         truthResult.style.display = 'block';
         truthMessage.textContent = '⚠️ Ошибка загрузки';
