@@ -18,6 +18,7 @@
       align-items: center;
     }
     .app { max-width: 1100px; width: 100%; }
+
     .header {
       text-align: center;
       margin-bottom: 20px;
@@ -33,6 +34,37 @@
       letter-spacing: 2px;
     }
     .header .sub { color: #8899aa; font-size: 0.9rem; }
+
+    /* ВКЛАДКИ */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      background: #141c24;
+      border: 1px solid #2a3a4a;
+      color: #c0d0e0;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .tab-btn:hover { border-color: #f5c542; box-shadow: 0 0 30px #f5c54222; }
+    .tab-btn.active { background: #f5c542; color: #0a0e14; border-color: #f5c542; }
+
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* КАРТЫ */
     .card {
       background: #101820;
       border: 1px solid #1a2a3a;
@@ -41,6 +73,7 @@
       margin: 12px 0;
     }
     .card h2 { color: #f5c542; font-weight: 400; margin-bottom: 10px; font-size: 1.2rem; }
+
     .input-group {
       display: flex;
       gap: 10px;
@@ -59,6 +92,7 @@
       outline: none;
     }
     .input-group input:focus { border-color: #f5c542; }
+
     .btn {
       background: #f5c542;
       border: none;
@@ -79,27 +113,6 @@
     .btn-outline:hover { background: #f5c54222; }
     .btn-small { font-size: 0.8rem; padding: 6px 16px; }
     .hidden { display: none !important; }
-
-    .game-selector {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-    .game-btn {
-      background: #141c24;
-      border: 1px solid #2a3a4a;
-      color: #c0d0e0;
-      padding: 12px 28px;
-      border-radius: 60px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .game-btn:hover { border-color: #f5c542; box-shadow: 0 0 30px #f5c54222; }
-    .game-btn.active { background: #f5c542; color: #0a0e14; border-color: #f5c542; }
 
     .cards-grid {
       display: flex;
@@ -151,11 +164,7 @@
       font-size: 0.85rem;
     }
     .info-chip .label { color: #f5c542; font-weight: 600; }
-    .info-empty {
-      color: #556;
-      font-style: italic;
-      font-size: 0.85rem;
-    }
+    .info-empty { color: #556; font-style: italic; font-size: 0.85rem; }
 
     .player-list {
       display: flex;
@@ -197,7 +206,7 @@
 
     @media (max-width: 600px) {
       .header h1 { font-size: 1.8rem; }
-      .game-btn { font-size: 0.8rem; padding: 8px 16px; }
+      .tab-btn { font-size: 0.8rem; padding: 8px 16px; }
       .card-item { flex: 1 1 100%; max-width: 100%; }
       .info-panel { flex: 1 1 100%; }
     }
@@ -208,18 +217,20 @@
 <div class="app">
   <div class="header">
     <h1>🎮 Игровой портал</h1>
-    <div class="sub">Бункер · Мафия · Шпион</div>
+    <div class="sub">Выбери игру</div>
   </div>
 
-  <!-- ВЫБОР ИГРЫ -->
-  <div class="game-selector">
-    <button class="game-btn active" data-game="bunker">🏚️ Бункер</button>
-    <button class="game-btn" data-game="mafia">🔪 Мафия</button>
-    <button class="game-btn" data-game="spy">🕵️ Шпион</button>
+  <!-- ВКЛАДКИ -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="bunker">🏚️ Бункер</button>
+    <button class="tab-btn" data-tab="mafia">🔪 Мафия</button>
+    <button class="tab-btn" data-tab="spy">🕵️ Шпион</button>
   </div>
 
-  <!-- БУНКЕР -->
-  <div id="bunkerSection">
+  <!-- ============================================================ -->
+  <!-- ВКЛАДКА: БУНКЕР -->
+  <!-- ============================================================ -->
+  <div id="tab-bunker" class="tab-content active">
     <div class="card">
       <h2>🏚️ Бункер</h2>
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
@@ -230,7 +241,6 @@
         <button class="btn btn-outline" id="truthOrDareBtn">🎲 Правда или Действие</button>
       </div>
 
-      <!-- Результат Правда/Действие -->
       <div id="truthOrDareResult" style="margin-top:10px; padding:12px 16px; background:#1a2a2a; border-radius:12px; font-size:1.1rem; display:none; align-items:center; flex-wrap:wrap; gap:10px;">
         <span id="truthOrDareMessage"></span>
         <button class="btn btn-secondary btn-small" id="helpBtn">🤝 Помощь зала</button>
@@ -251,41 +261,81 @@
     </div>
   </div>
 
-  <!-- ОНЛАЙН -->
-  <div id="onlineSection" class="hidden">
-    <div id="lobbyScreen" class="card">
-      <h2>🏠 Вход в игру</h2>
+  <!-- ============================================================ -->
+  <!-- ВКЛАДКА: МАФИЯ -->
+  <!-- ============================================================ -->
+  <div id="tab-mafia" class="tab-content">
+    <div id="mafiaLobby" class="card">
+      <h2>🔪 Мафия — Вход</h2>
       <div class="input-group" style="margin-bottom:10px;">
-        <input type="text" id="playerNameInput" placeholder="Ваш ник" value="Игрок">
+        <input type="text" id="mafiaPlayerName" placeholder="Ваш ник" value="Игрок">
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn" id="createRoomBtn">➕ Создать комнату</button>
+        <button class="btn" id="mafiaCreateBtn">➕ Создать комнату</button>
         <div style="display:flex; gap:6px; flex:1; min-width:200px;">
-          <input type="text" id="roomCodeInput" placeholder="Код комнаты" style="flex:1; background:#0a141c; border:1px solid #1a2a3a; color:#e8e8e8; padding:10px 16px; border-radius:30px; font-size:1rem; outline:none;">
-          <button class="btn btn-secondary" id="joinRoomBtn">🔗 Войти</button>
+          <input type="text" id="mafiaRoomCode" placeholder="Код комнаты" style="flex:1; background:#0a141c; border:1px solid #1a2a3a; color:#e8e8e8; padding:10px 16px; border-radius:30px; font-size:1rem; outline:none;">
+          <button class="btn btn-secondary" id="mafiaJoinBtn">🔗 Войти</button>
         </div>
       </div>
-      <div id="onlineError" style="color:#ff6666; margin-top:8px;"></div>
+      <div id="mafiaError" style="color:#ff6666; margin-top:8px;"></div>
     </div>
 
-    <div id="roomScreen" class="card hidden">
-      <h2>📦 Комната: <span id="roomCodeDisplay">---</span></h2>
+    <div id="mafiaRoom" class="card hidden">
+      <h2>📦 Комната: <span id="mafiaRoomCodeDisplay">---</span></h2>
       <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
-        <span id="onlineGameType" style="color:#aab;">Игра: Мафия</span>
-        <span id="playersCountDisplay" style="color:#aab;">Игроков: 0</span>
+        <span id="mafiaPlayersCount" style="color:#aab;">Игроков: 0</span>
       </div>
-      <div class="player-list" id="playerList"></div>
-      <button class="btn btn-success" id="startGameBtn">🚀 Начать игру</button>
-      <button class="btn btn-secondary" id="leaveRoomBtn">🚪 Выйти</button>
+      <div class="player-list" id="mafiaPlayerList"></div>
+      <button class="btn btn-success" id="mafiaStartBtn">🚀 Начать игру</button>
+      <button class="btn btn-secondary" id="mafiaLeaveBtn">🚪 Выйти</button>
     </div>
 
-    <div id="gameScreen" class="card hidden">
-      <h2>🎮 Игра идёт</h2>
-      <div id="phaseDisplay" style="color:#f5c542; font-size:1.2rem;">🌙 Ночь</div>
-      <div class="log" id="gameLog"></div>
-      <div class="role-reveal"><span class="role" id="myRoleDisplay">???</span></div>
-      <div id="actionArea"></div>
-      <button class="btn btn-secondary" id="leaveGameBtn">🚪 Выйти</button>
+    <div id="mafiaGame" class="card hidden">
+      <h2>🎮 Мафия — игра</h2>
+      <div id="mafiaPhase" style="color:#f5c542; font-size:1.2rem;">🌙 Ночь</div>
+      <div class="log" id="mafiaLog"></div>
+      <div class="role-reveal"><span class="role" id="mafiaMyRole">???</span></div>
+      <div id="mafiaActionArea"></div>
+      <button class="btn btn-secondary" id="mafiaLeaveGameBtn">🚪 Выйти</button>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- ВКЛАДКА: ШПИОН -->
+  <!-- ============================================================ -->
+  <div id="tab-spy" class="tab-content">
+    <div id="spyLobby" class="card">
+      <h2>🕵️ Шпион — Вход</h2>
+      <div class="input-group" style="margin-bottom:10px;">
+        <input type="text" id="spyPlayerName" placeholder="Ваш ник" value="Игрок">
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn" id="spyCreateBtn">➕ Создать комнату</button>
+        <div style="display:flex; gap:6px; flex:1; min-width:200px;">
+          <input type="text" id="spyRoomCode" placeholder="Код комнаты" style="flex:1; background:#0a141c; border:1px solid #1a2a3a; color:#e8e8e8; padding:10px 16px; border-radius:30px; font-size:1rem; outline:none;">
+          <button class="btn btn-secondary" id="spyJoinBtn">🔗 Войти</button>
+        </div>
+      </div>
+      <div id="spyError" style="color:#ff6666; margin-top:8px;"></div>
+    </div>
+
+    <div id="spyRoom" class="card hidden">
+      <h2>📦 Комната: <span id="spyRoomCodeDisplay">---</span></h2>
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+        <span id="spyPlayersCount" style="color:#aab;">Игроков: 0</span>
+      </div>
+      <div class="player-list" id="spyPlayerList"></div>
+      <button class="btn btn-success" id="spyStartBtn">🚀 Начать игру</button>
+      <button class="btn btn-secondary" id="spyLeaveBtn">🚪 Выйти</button>
+    </div>
+
+    <div id="spyGame" class="card hidden">
+      <h2>🎮 Шпион — игра</h2>
+      <div id="spyPhase" style="color:#f5c542; font-size:1.2rem;">🕵️ Обсуждение</div>
+      <div class="log" id="spyLog"></div>
+      <div class="role-reveal"><span class="role" id="spyMyRole">???</span></div>
+      <div id="spyActionArea"></div>
+      <button class="btn btn-secondary" id="spyLeaveGameBtn">🚪 Выйти</button>
     </div>
   </div>
 </div>
@@ -293,28 +343,24 @@
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
   (function() {
-    // --- ПЕРЕКЛЮЧЕНИЕ ИГР ---
-    const gameBtns = document.querySelectorAll('.game-btn');
-    const bunkerSection = document.getElementById('bunkerSection');
-    const onlineSection = document.getElementById('onlineSection');
+    // ============================================================
+    // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+    // ============================================================
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-    function switchGame(game) {
-      gameBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.game === game));
-      if (game === 'bunker') {
-        bunkerSection.classList.remove('hidden');
-        onlineSection.classList.add('hidden');
-      } else {
-        bunkerSection.classList.add('hidden');
-        onlineSection.classList.remove('hidden');
-        document.getElementById('onlineGameType').textContent = `Игра: ${game === 'mafia' ? '🔪 Мафия' : '🕵️ Шпион'}`;
-      }
-    }
-
-    gameBtns.forEach(btn => {
-      btn.addEventListener('click', () => switchGame(btn.dataset.game));
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
     });
 
-    // --- БУНКЕР ---
+    // ============================================================
+    // БУНКЕР
+    // ============================================================
     const bunkerCards = document.getElementById('bunkerCards');
     const catastropheContent = document.getElementById('catastropheContent');
     const bunkerContent = document.getElementById('bunkerContent');
@@ -390,11 +436,7 @@
         const data = await res.json();
         truthOrDareResult.style.display = 'flex';
         truthOrDareMessage.textContent = data.message;
-        if (data.type === 'skip') {
-          helpBtn.style.display = 'none';
-        } else {
-          helpBtn.style.display = 'inline-block';
-        }
+        helpBtn.style.display = data.type === 'skip' ? 'none' : 'inline-block';
       } catch(e) {
         truthOrDareResult.style.display = 'flex';
         truthOrDareMessage.textContent = '⚠️ Ошибка загрузки';
@@ -413,92 +455,65 @@
       }
     });
 
-    // --- ОНЛАЙН ---
-    const socket = io();
+    // ============================================================
+    // МАФИЯ (ОТДЕЛЬНЫЙ SOCKET)
+    // ============================================================
+    const mafiaSocket = io();
 
-    const lobbyScreen = document.getElementById('lobbyScreen');
-    const roomScreen = document.getElementById('roomScreen');
-    const gameScreen = document.getElementById('gameScreen');
-    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
-    const playersCountDisplay = document.getElementById('playersCountDisplay');
-    const playerList = document.getElementById('playerList');
-    const gameLog = document.getElementById('gameLog');
-    const phaseDisplay = document.getElementById('phaseDisplay');
-    const myRoleDisplay = document.getElementById('myRoleDisplay');
-    const actionArea = document.getElementById('actionArea');
-    const onlineError = document.getElementById('onlineError');
+    const mafiaLobby = document.getElementById('mafiaLobby');
+    const mafiaRoom = document.getElementById('mafiaRoom');
+    const mafiaGame = document.getElementById('mafiaGame');
+    const mafiaRoomCodeDisplay = document.getElementById('mafiaRoomCodeDisplay');
+    const mafiaPlayersCount = document.getElementById('mafiaPlayersCount');
+    const mafiaPlayerList = document.getElementById('mafiaPlayerList');
+    const mafiaLog = document.getElementById('mafiaLog');
+    const mafiaPhase = document.getElementById('mafiaPhase');
+    const mafiaMyRole = document.getElementById('mafiaMyRole');
+    const mafiaActionArea = document.getElementById('mafiaActionArea');
+    const mafiaError = document.getElementById('mafiaError');
 
-    const playerNameInput = document.getElementById('playerNameInput');
-    const roomCodeInput = document.getElementById('roomCodeInput');
+    const mafiaPlayerName = document.getElementById('mafiaPlayerName');
+    const mafiaRoomCode = document.getElementById('mafiaRoomCode');
 
-    let currentRoom = null;
-    let isHost = false;
+    let mafiaCurrentRoom = null;
+    let mafiaIsHost = false;
 
-    function showOnlineError(msg) {
-      onlineError.textContent = msg;
-      setTimeout(() => onlineError.textContent = '', 5000);
+    function showMafiaError(msg) {
+      mafiaError.textContent = msg;
+      setTimeout(() => mafiaError.textContent = '', 5000);
     }
 
-    function updatePlayerList(players) {
-      playerList.innerHTML = '';
+    function updateMafiaPlayerList(players) {
+      mafiaPlayerList.innerHTML = '';
       players.forEach(p => {
         const chip = document.createElement('span');
         chip.className = 'player-chip' + (p.isHost ? ' host' : '');
         chip.textContent = p.name + (p.isHost ? ' 👑' : '');
-        playerList.appendChild(chip);
+        mafiaPlayerList.appendChild(chip);
       });
-      playersCountDisplay.textContent = `Игроков: ${players.length}`;
+      mafiaPlayersCount.textContent = `Игроков: ${players.length}`;
     }
 
-    function updateGameLog(entries) {
-      gameLog.innerHTML = '';
+    function updateMafiaLog(entries) {
+      mafiaLog.innerHTML = '';
       entries.forEach(entry => {
         const div = document.createElement('div');
         div.className = 'entry';
         div.textContent = entry;
-        gameLog.appendChild(div);
+        mafiaLog.appendChild(div);
       });
-      gameLog.scrollTop = gameLog.scrollHeight;
+      mafiaLog.scrollTop = mafiaLog.scrollHeight;
     }
 
-    function renderActionArea(data) {
-      actionArea.innerHTML = '';
-      const gameType = data.gameType || 'mafia';
-      if (gameType === 'mafia') {
-        if (data.phase === 'night') {
-          const role = data.roles ? data.roles[socket.id] : '';
-          if (role === 'Мафия' || role === 'Дон мафии') {
-            const alive = data.alive || [];
-            if (alive.length > 0) {
-              const select = document.createElement('select');
-              select.id = 'mafiaTarget';
-              alive.forEach(name => {
-                const opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name;
-                select.appendChild(opt);
-              });
-              const btn = document.createElement('button');
-              btn.className = 'btn btn-danger btn-small';
-              btn.textContent = '🔪 Убить';
-              btn.addEventListener('click', () => {
-                const target = select.value;
-                if (target) {
-                  socket.emit('nightVote', { roomCode: currentRoom, targetPlayerName: target });
-                  actionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
-                }
-              });
-              actionArea.appendChild(select);
-              actionArea.appendChild(btn);
-            }
-          } else {
-            actionArea.innerHTML = '<p style="color:#aab;">🌙 Город засыпает... Ожидайте утра.</p>';
-          }
-        } else if (data.phase === 'day') {
+    function renderMafiaAction(data) {
+      mafiaActionArea.innerHTML = '';
+      if (data.phase === 'night') {
+        const role = data.roles ? data.roles[mafiaSocket.id] : '';
+        if (role === 'Мафия' || role === 'Дон мафии') {
           const alive = data.alive || [];
           if (alive.length > 0) {
             const select = document.createElement('select');
-            select.id = 'dayTarget';
+            select.id = 'mafiaTarget';
             alive.forEach(name => {
               const opt = document.createElement('option');
               opt.value = name;
@@ -506,24 +521,26 @@
               select.appendChild(opt);
             });
             const btn = document.createElement('button');
-            btn.className = 'btn btn-secondary btn-small';
-            btn.textContent = '🗳️ Голосовать';
+            btn.className = 'btn btn-danger btn-small';
+            btn.textContent = '🔪 Убить';
             btn.addEventListener('click', () => {
               const target = select.value;
               if (target) {
-                socket.emit('dayVote', { roomCode: currentRoom, targetPlayerName: target });
-                actionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
+                mafiaSocket.emit('nightVote', { roomCode: mafiaCurrentRoom, targetPlayerName: target });
+                mafiaActionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
               }
             });
-            actionArea.appendChild(select);
-            actionArea.appendChild(btn);
+            mafiaActionArea.appendChild(select);
+            mafiaActionArea.appendChild(btn);
           }
+        } else {
+          mafiaActionArea.innerHTML = '<p style="color:#aab;">🌙 Город засыпает... Ожидайте утра.</p>';
         }
-      } else if (gameType === 'spy') {
+      } else if (data.phase === 'day') {
         const alive = data.alive || [];
         if (alive.length > 0) {
           const select = document.createElement('select');
-          select.id = 'spyTarget';
+          select.id = 'dayTarget';
           alive.forEach(name => {
             const opt = document.createElement('option');
             opt.value = name;
@@ -532,98 +549,240 @@
           });
           const btn = document.createElement('button');
           btn.className = 'btn btn-secondary btn-small';
-          btn.textContent = '🕵️ Указать на шпиона';
+          btn.textContent = '🗳️ Голосовать';
           btn.addEventListener('click', () => {
             const target = select.value;
             if (target) {
-              socket.emit('dayVote', { roomCode: currentRoom, targetPlayerName: target });
-              actionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
+              mafiaSocket.emit('dayVote', { roomCode: mafiaCurrentRoom, targetPlayerName: target });
+              mafiaActionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
             }
           });
-          actionArea.appendChild(select);
-          actionArea.appendChild(btn);
+          mafiaActionArea.appendChild(select);
+          mafiaActionArea.appendChild(btn);
         }
       }
     }
 
-    function leaveRoom() {
-      socket.disconnect();
-      socket.connect();
-      lobbyScreen.classList.remove('hidden');
-      roomScreen.classList.add('hidden');
-      gameScreen.classList.add('hidden');
-      currentRoom = null;
+    function mafiaLeave() {
+      mafiaSocket.disconnect();
+      mafiaSocket.connect();
+      mafiaLobby.classList.remove('hidden');
+      mafiaRoom.classList.add('hidden');
+      mafiaGame.classList.add('hidden');
+      mafiaCurrentRoom = null;
     }
 
-    socket.on('roomCreated', (data) => {
-      currentRoom = data.roomCode;
-      isHost = true;
-      lobbyScreen.classList.add('hidden');
-      roomScreen.classList.remove('hidden');
-      roomCodeDisplay.textContent = data.roomCode;
+    mafiaSocket.on('roomCreated', (data) => {
+      mafiaCurrentRoom = data.roomCode;
+      mafiaIsHost = true;
+      mafiaLobby.classList.add('hidden');
+      mafiaRoom.classList.remove('hidden');
+      mafiaRoomCodeDisplay.textContent = data.roomCode;
     });
 
-    socket.on('joinedRoom', (data) => {
-      currentRoom = data.roomCode;
-      isHost = false;
-      lobbyScreen.classList.add('hidden');
-      roomScreen.classList.remove('hidden');
-      roomCodeDisplay.textContent = data.roomCode;
+    mafiaSocket.on('joinedRoom', (data) => {
+      mafiaCurrentRoom = data.roomCode;
+      mafiaIsHost = false;
+      mafiaLobby.classList.add('hidden');
+      mafiaRoom.classList.remove('hidden');
+      mafiaRoomCodeDisplay.textContent = data.roomCode;
     });
 
-    socket.on('playersUpdate', updatePlayerList);
+    mafiaSocket.on('playersUpdate', updateMafiaPlayerList);
 
-    socket.on('gameStarted', (data) => {
-      roomScreen.classList.add('hidden');
-      gameScreen.classList.remove('hidden');
-      phaseDisplay.textContent = data.phase === 'night' ? '🌙 Ночь' : '☀️ День';
-      const role = data.roles ? data.roles[socket.id] : '???';
-      myRoleDisplay.textContent = role;
-      if (data.gameType === 'spy' && data.location) {
-        myRoleDisplay.textContent += ` | Локация: ${data.location}`;
+    mafiaSocket.on('gameStarted', (data) => {
+      mafiaRoom.classList.add('hidden');
+      mafiaGame.classList.remove('hidden');
+      mafiaPhase.textContent = data.phase === 'night' ? '🌙 Ночь' : '☀️ День';
+      const role = data.roles ? data.roles[mafiaSocket.id] : '???';
+      mafiaMyRole.textContent = role;
+      updateMafiaLog(data.log || []);
+      renderMafiaAction(data);
+    });
+
+    mafiaSocket.on('nightResult', (data) => {
+      updateMafiaLog([`🌙 Мафия выбрала ${data.kill}`]);
+    });
+
+    mafiaSocket.on('dayResult', (data) => {
+      updateMafiaLog([`☀️ Игрок ${data.eliminated} выгнан!`]);
+    });
+
+    mafiaSocket.on('gameEnded', (data) => {
+      updateMafiaLog([`🏆 Победили: ${data.winner}!`]);
+      mafiaPhase.textContent = `🏆 Игра окончена! Победили: ${data.winner}`;
+      mafiaActionArea.innerHTML = '<p style="color:#f5c542;">Игра завершена. Нажмите "Выйти".</p>';
+    });
+
+    mafiaSocket.on('error', showMafiaError);
+
+    document.getElementById('mafiaCreateBtn').addEventListener('click', () => {
+      const name = mafiaPlayerName.value.trim() || 'Игрок';
+      mafiaSocket.emit('createRoom', { playerName: name, gameType: 'mafia' });
+    });
+
+    document.getElementById('mafiaJoinBtn').addEventListener('click', () => {
+      const name = mafiaPlayerName.value.trim() || 'Игрок';
+      const code = mafiaRoomCode.value.trim().toUpperCase();
+      if (!code) { showMafiaError('Введите код комнаты'); return; }
+      mafiaSocket.emit('joinRoom', { roomCode: code, playerName: name });
+    });
+
+    document.getElementById('mafiaStartBtn').addEventListener('click', () => {
+      if (mafiaCurrentRoom) mafiaSocket.emit('startGame', mafiaCurrentRoom);
+    });
+
+    document.getElementById('mafiaLeaveBtn').addEventListener('click', mafiaLeave);
+    document.getElementById('mafiaLeaveGameBtn').addEventListener('click', mafiaLeave);
+
+    // ============================================================
+    // ШПИОН (ОТДЕЛЬНЫЙ SOCKET)
+    // ============================================================
+    const spySocket = io();
+
+    const spyLobby = document.getElementById('spyLobby');
+    const spyRoom = document.getElementById('spyRoom');
+    const spyGame = document.getElementById('spyGame');
+    const spyRoomCodeDisplay = document.getElementById('spyRoomCodeDisplay');
+    const spyPlayersCount = document.getElementById('spyPlayersCount');
+    const spyPlayerList = document.getElementById('spyPlayerList');
+    const spyLog = document.getElementById('spyLog');
+    const spyPhase = document.getElementById('spyPhase');
+    const spyMyRole = document.getElementById('spyMyRole');
+    const spyActionArea = document.getElementById('spyActionArea');
+    const spyError = document.getElementById('spyError');
+
+    const spyPlayerName = document.getElementById('spyPlayerName');
+    const spyRoomCode = document.getElementById('spyRoomCode');
+
+    let spyCurrentRoom = null;
+    let spyIsHost = false;
+
+    function showSpyError(msg) {
+      spyError.textContent = msg;
+      setTimeout(() => spyError.textContent = '', 5000);
+    }
+
+    function updateSpyPlayerList(players) {
+      spyPlayerList.innerHTML = '';
+      players.forEach(p => {
+        const chip = document.createElement('span');
+        chip.className = 'player-chip' + (p.isHost ? ' host' : '');
+        chip.textContent = p.name + (p.isHost ? ' 👑' : '');
+        spyPlayerList.appendChild(chip);
+      });
+      spyPlayersCount.textContent = `Игроков: ${players.length}`;
+    }
+
+    function updateSpyLog(entries) {
+      spyLog.innerHTML = '';
+      entries.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.textContent = entry;
+        spyLog.appendChild(div);
+      });
+      spyLog.scrollTop = spyLog.scrollHeight;
+    }
+
+    function renderSpyAction(data) {
+      spyActionArea.innerHTML = '';
+      const alive = data.alive || [];
+      if (alive.length > 0) {
+        const select = document.createElement('select');
+        select.id = 'spyTarget';
+        alive.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          select.appendChild(opt);
+        });
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-secondary btn-small';
+        btn.textContent = '🕵️ Указать на шпиона';
+        btn.addEventListener('click', () => {
+          const target = select.value;
+          if (target) {
+            spySocket.emit('dayVote', { roomCode: spyCurrentRoom, targetPlayerName: target });
+            spyActionArea.innerHTML = '<p style="color:#7aff7a;">✅ Голос учтён!</p>';
+          }
+        });
+        spyActionArea.appendChild(select);
+        spyActionArea.appendChild(btn);
       }
-      updateGameLog(data.log || []);
-      renderActionArea(data);
+    }
+
+    function spyLeave() {
+      spySocket.disconnect();
+      spySocket.connect();
+      spyLobby.classList.remove('hidden');
+      spyRoom.classList.add('hidden');
+      spyGame.classList.add('hidden');
+      spyCurrentRoom = null;
+    }
+
+    spySocket.on('roomCreated', (data) => {
+      spyCurrentRoom = data.roomCode;
+      spyIsHost = true;
+      spyLobby.classList.add('hidden');
+      spyRoom.classList.remove('hidden');
+      spyRoomCodeDisplay.textContent = data.roomCode;
     });
 
-    socket.on('nightResult', (data) => {
-      updateGameLog([`🌙 Мафия выбрала ${data.kill}`]);
+    spySocket.on('joinedRoom', (data) => {
+      spyCurrentRoom = data.roomCode;
+      spyIsHost = false;
+      spyLobby.classList.add('hidden');
+      spyRoom.classList.remove('hidden');
+      spyRoomCodeDisplay.textContent = data.roomCode;
     });
 
-    socket.on('dayResult', (data) => {
-      updateGameLog([`☀️ Игрок ${data.eliminated} выгнан!`]);
+    spySocket.on('playersUpdate', updateSpyPlayerList);
+
+    spySocket.on('gameStarted', (data) => {
+      spyRoom.classList.add('hidden');
+      spyGame.classList.remove('hidden');
+      spyPhase.textContent = '🕵️ Обсуждение';
+      const role = data.roles ? data.roles[spySocket.id] : '???';
+      spyMyRole.textContent = role + (data.location ? ` | Локация: ${data.location}` : '');
+      updateSpyLog(data.log || []);
+      renderSpyAction(data);
     });
 
-    socket.on('gameEnded', (data) => {
-      updateGameLog([`🏆 Победили: ${data.winner}!`]);
-      phaseDisplay.textContent = `🏆 Игра окончена! Победили: ${data.winner}`;
-      actionArea.innerHTML = '<p style="color:#f5c542;">Игра завершена. Нажмите "Выйти".</p>';
+    spySocket.on('dayResult', (data) => {
+      updateSpyLog([`🕵️ Игрок ${data.eliminated} указан как шпион!`]);
     });
 
-    socket.on('error', showOnlineError);
-
-    document.getElementById('createRoomBtn').addEventListener('click', () => {
-      const name = playerNameInput.value.trim() || 'Игрок';
-      const gameType = document.getElementById('onlineGameType').textContent.includes('Мафия') ? 'mafia' : 'spy';
-      socket.emit('createRoom', { playerName: name, gameType });
+    spySocket.on('gameEnded', (data) => {
+      updateSpyLog([`🏆 Победили: ${data.winner}!`]);
+      spyPhase.textContent = `🏆 Игра окончена! Победили: ${data.winner}`;
+      spyActionArea.innerHTML = '<p style="color:#f5c542;">Игра завершена. Нажмите "Выйти".</p>';
     });
 
-    document.getElementById('joinRoomBtn').addEventListener('click', () => {
-      const name = playerNameInput.value.trim() || 'Игрок';
-      const code = roomCodeInput.value.trim().toUpperCase();
-      if (!code) { showOnlineError('Введите код комнаты'); return; }
-      socket.emit('joinRoom', { roomCode: code, playerName: name });
+    spySocket.on('error', showSpyError);
+
+    document.getElementById('spyCreateBtn').addEventListener('click', () => {
+      const name = spyPlayerName.value.trim() || 'Игрок';
+      spySocket.emit('createRoom', { playerName: name, gameType: 'spy' });
     });
 
-    document.getElementById('startGameBtn').addEventListener('click', () => {
-      if (currentRoom) socket.emit('startGame', currentRoom);
+    document.getElementById('spyJoinBtn').addEventListener('click', () => {
+      const name = spyPlayerName.value.trim() || 'Игрок';
+      const code = spyRoomCode.value.trim().toUpperCase();
+      if (!code) { showSpyError('Введите код комнаты'); return; }
+      spySocket.emit('joinRoom', { roomCode: code, playerName: name });
     });
 
-    document.getElementById('leaveRoomBtn').addEventListener('click', leaveRoom);
-    document.getElementById('leaveGameBtn').addEventListener('click', leaveRoom);
+    document.getElementById('spyStartBtn').addEventListener('click', () => {
+      if (spyCurrentRoom) spySocket.emit('startGame', spyCurrentRoom);
+    });
 
-    // --- ЗАПУСК ---
-    switchGame('bunker');
+    document.getElementById('spyLeaveBtn').addEventListener('click', spyLeave);
+    document.getElementById('spyLeaveGameBtn').addEventListener('click', spyLeave);
+
+    // ============================================================
+    // ЗАПУСК БУНКЕРА ПРИ ЗАГРУЗКЕ
+    // ============================================================
     fetchBunkerCards();
   })();
 </script>
