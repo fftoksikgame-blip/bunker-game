@@ -520,7 +520,7 @@ io.on('connection', (socket) => {
 });
 
 // ============================================================
-// ПРАВДА ИЛИ ДЕЙСТВИЕ (БЕЗ ПОВТОРОВ В ПОМОЩИ)
+// ПРАВДА ИЛИ ДЕЙСТВИЕ
 // ============================================================
 
 const truthQuestions = [
@@ -584,7 +584,6 @@ const helpActions = [
   'Закрой глаза на 3 секунды.'
 ];
 
-// Хранилище использованных вариантов для помощи зала
 let usedHelp = {
   truth: [],
   dare: []
@@ -606,13 +605,11 @@ app.get('/api/truthordare', (req, res) => {
 });
 
 app.get('/api/help', (req, res) => {
-  const isTruth = Math.random() < 0.5;
-  let help;
-  let type;
-
-  if (isTruth) {
-    type = 'truth';
+  const type = req.query.type || 'truth';
+  
+  if (type === 'truth') {
     const available = helpQuestions.filter(q => !usedHelp.truth.includes(q));
+    let help;
     if (available.length === 0) {
       usedHelp.truth = [];
       help = random(helpQuestions);
@@ -622,8 +619,8 @@ app.get('/api/help', (req, res) => {
     usedHelp.truth.push(help);
     res.json({ message: `❓ Правда: ${help}` });
   } else {
-    type = 'dare';
     const available = helpActions.filter(a => !usedHelp.dare.includes(a));
+    let help;
     if (available.length === 0) {
       usedHelp.dare = [];
       help = random(helpActions);
