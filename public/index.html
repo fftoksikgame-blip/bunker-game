@@ -64,7 +64,6 @@
       display: block;
     }
 
-    /* КАРТЫ */
     .card {
       background: #101820;
       border: 1px solid #1a2a3a;
@@ -166,6 +165,16 @@
     .info-chip .label { color: #f5c542; font-weight: 600; }
     .info-empty { color: #556; font-style: italic; font-size: 0.85rem; }
 
+    .truth-result {
+      background: #1a2a2a;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 12px 0;
+      font-size: 1.2rem;
+      text-align: center;
+      border-left: 4px solid #f5c542;
+    }
+
     .player-list {
       display: flex;
       flex-wrap: wrap;
@@ -225,6 +234,7 @@
     <button class="tab-btn active" data-tab="bunker">🏚️ Бункер</button>
     <button class="tab-btn" data-tab="mafia">🔪 Мафия</button>
     <button class="tab-btn" data-tab="spy">🕵️ Шпион</button>
+    <button class="tab-btn" data-tab="truth">🎲 Правда или Действие</button>
   </div>
 
   <!-- ============================================================ -->
@@ -238,12 +248,6 @@
         <button class="btn btn-secondary" id="bunkerRestartBtn">⟳ Заново</button>
         <button class="btn btn-outline" id="bunkerCatastropheBtn">🌪️ Эпидемия</button>
         <button class="btn btn-outline" id="bunkerContentsBtn">📦 Бункер</button>
-        <button class="btn btn-outline" id="truthOrDareBtn">🎲 Правда или Действие</button>
-      </div>
-
-      <div id="truthOrDareResult" style="margin-top:10px; padding:12px 16px; background:#1a2a2a; border-radius:12px; font-size:1.1rem; display:none; align-items:center; flex-wrap:wrap; gap:10px;">
-        <span id="truthOrDareMessage"></span>
-        <button class="btn btn-secondary btn-small" id="helpBtn">🤝 Помощь зала</button>
       </div>
 
       <div class="info-panels">
@@ -338,6 +342,22 @@
       <button class="btn btn-secondary" id="spyLeaveGameBtn">🚪 Выйти</button>
     </div>
   </div>
+
+  <!-- ============================================================ -->
+  <!-- ВКЛАДКА: ПРАВДА ИЛИ ДЕЙСТВИЕ -->
+  <!-- ============================================================ -->
+  <div id="tab-truth" class="tab-content">
+    <div class="card">
+      <h2>🎲 Правда или Действие</h2>
+      <p style="color:#aab; margin-bottom:12px;">Нажми на кнопку — с 5% шансом выпадет Правда, Действие или Скип.</p>
+      <button class="btn" id="truthMainBtn">🎲 Крутить</button>
+
+      <div id="truthResult" class="truth-result" style="display:none;">
+        <span id="truthMessage"></span>
+        <button class="btn btn-secondary btn-small" id="truthHelpBtn" style="margin-left:10px;">🤝 Помощь зала</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -424,34 +444,36 @@
     document.getElementById('bunkerCatastropheBtn').addEventListener('click', fetchCatastrophe);
     document.getElementById('bunkerContentsBtn').addEventListener('click', fetchBunkerContents);
 
-    // --- ПРАВДА ИЛИ ДЕЙСТВИЕ ---
-    const truthOrDareBtn = document.getElementById('truthOrDareBtn');
-    const truthOrDareResult = document.getElementById('truthOrDareResult');
-    const truthOrDareMessage = document.getElementById('truthOrDareMessage');
-    const helpBtn = document.getElementById('helpBtn');
+    // ============================================================
+    // ПРАВДА ИЛИ ДЕЙСТВИЕ (ОТДЕЛЬНАЯ ИГРА)
+    // ============================================================
+    const truthMainBtn = document.getElementById('truthMainBtn');
+    const truthResult = document.getElementById('truthResult');
+    const truthMessage = document.getElementById('truthMessage');
+    const truthHelpBtn = document.getElementById('truthHelpBtn');
 
-    truthOrDareBtn.addEventListener('click', async () => {
+    truthMainBtn.addEventListener('click', async () => {
       try {
         const res = await fetch('/api/truthordare');
         const data = await res.json();
-        truthOrDareResult.style.display = 'flex';
-        truthOrDareMessage.textContent = data.message;
-        helpBtn.style.display = data.type === 'skip' ? 'none' : 'inline-block';
+        truthResult.style.display = 'block';
+        truthMessage.textContent = data.message;
+        truthHelpBtn.style.display = data.type === 'skip' ? 'none' : 'inline-block';
       } catch(e) {
-        truthOrDareResult.style.display = 'flex';
-        truthOrDareMessage.textContent = '⚠️ Ошибка загрузки';
-        helpBtn.style.display = 'none';
+        truthResult.style.display = 'block';
+        truthMessage.textContent = '⚠️ Ошибка загрузки';
+        truthHelpBtn.style.display = 'none';
       }
     });
 
-    helpBtn.addEventListener('click', async () => {
+    truthHelpBtn.addEventListener('click', async () => {
       try {
         const res = await fetch('/api/help');
         const data = await res.json();
-        truthOrDareMessage.textContent = data.message;
-        helpBtn.style.display = 'none';
+        truthMessage.textContent = data.message;
+        truthHelpBtn.style.display = 'none';
       } catch(e) {
-        truthOrDareMessage.textContent = '⚠️ Ошибка помощи';
+        truthMessage.textContent = '⚠️ Ошибка помощи';
       }
     });
 
