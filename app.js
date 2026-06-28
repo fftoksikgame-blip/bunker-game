@@ -201,10 +201,6 @@ const bunkerConditions = [
   { name: 'Если ты выгнан — забираешь с собой одного игрока', desc: 'Уводит с собой.' }
 ];
 
-// ============================================================
-// ГЕНЕРАЦИЯ БУНКЕРА
-// ============================================================
-
 function generateBunkerSet() {
   const prof = random(professions);
   const fact = random(bunkerFacts);
@@ -327,7 +323,7 @@ app.get('/api/bunker', (req, res) => {
 });
 
 // ============================================================
-// МАФИЯ — РАСШИРЕННЫЕ РОЛИ
+// МАФИЯ
 // ============================================================
 
 function generateMafiaRoles(playerCount) {
@@ -359,7 +355,7 @@ function generateMafiaRoles(playerCount) {
 }
 
 // ============================================================
-// ОНЛАЙН: МАФИЯ И ШПИОН
+// ОНЛАЙН
 // ============================================================
 
 const rooms = {};
@@ -524,7 +520,7 @@ io.on('connection', (socket) => {
 });
 
 // ============================================================
-// ПРАВДА ИЛИ ДЕЙСТВИЕ (ТОЛЬКО ТИП, ЗАДАНИЕ ПО КНОПКЕ)
+// ПРАВДА ИЛИ ДЕЙСТВИЕ (БЕЗ ПОВТОРОВ В ПОМОЩИ)
 // ============================================================
 
 const truthQuestions = [
@@ -588,6 +584,12 @@ const helpActions = [
   'Закрой глаза на 3 секунды.'
 ];
 
+// Хранилище использованных вариантов для помощи зала
+let usedHelp = {
+  truth: [],
+  dare: []
+};
+
 app.get('/api/truthordare', (req, res) => {
   const roll = Math.floor(Math.random() * 3);
   
@@ -606,11 +608,29 @@ app.get('/api/truthordare', (req, res) => {
 app.get('/api/help', (req, res) => {
   const isTruth = Math.random() < 0.5;
   let help;
+  let type;
+
   if (isTruth) {
-    help = random(helpQuestions);
+    type = 'truth';
+    const available = helpQuestions.filter(q => !usedHelp.truth.includes(q));
+    if (available.length === 0) {
+      usedHelp.truth = [];
+      help = random(helpQuestions);
+    } else {
+      help = random(available);
+    }
+    usedHelp.truth.push(help);
     res.json({ message: `❓ Правда: ${help}` });
   } else {
-    help = random(helpActions);
+    type = 'dare';
+    const available = helpActions.filter(a => !usedHelp.dare.includes(a));
+    if (available.length === 0) {
+      usedHelp.dare = [];
+      help = random(helpActions);
+    } else {
+      help = random(available);
+    }
+    usedHelp.dare.push(help);
     res.json({ message: `🎯 Действие: ${help}` });
   }
 });
