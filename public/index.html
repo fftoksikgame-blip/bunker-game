@@ -227,6 +227,13 @@
         <button class="btn btn-secondary" id="bunkerRestartBtn">⟳ Заново</button>
         <button class="btn btn-outline" id="bunkerCatastropheBtn">🌪️ Эпидемия</button>
         <button class="btn btn-outline" id="bunkerContentsBtn">📦 Бункер</button>
+        <button class="btn btn-outline" id="truthOrDareBtn">🎲 Правда или Действие</button>
+      </div>
+
+      <!-- Результат Правда/Действие -->
+      <div id="truthOrDareResult" style="margin-top:10px; padding:12px 16px; background:#1a2a2a; border-radius:12px; font-size:1.1rem; display:none; align-items:center; flex-wrap:wrap; gap:10px;">
+        <span id="truthOrDareMessage"></span>
+        <button class="btn btn-secondary btn-small" id="helpBtn">🤝 Помощь зала</button>
       </div>
 
       <div class="info-panels">
@@ -370,6 +377,41 @@
     });
     document.getElementById('bunkerCatastropheBtn').addEventListener('click', fetchCatastrophe);
     document.getElementById('bunkerContentsBtn').addEventListener('click', fetchBunkerContents);
+
+    // --- ПРАВДА ИЛИ ДЕЙСТВИЕ ---
+    const truthOrDareBtn = document.getElementById('truthOrDareBtn');
+    const truthOrDareResult = document.getElementById('truthOrDareResult');
+    const truthOrDareMessage = document.getElementById('truthOrDareMessage');
+    const helpBtn = document.getElementById('helpBtn');
+
+    truthOrDareBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/truthordare');
+        const data = await res.json();
+        truthOrDareResult.style.display = 'flex';
+        truthOrDareMessage.textContent = data.message;
+        if (data.type === 'skip') {
+          helpBtn.style.display = 'none';
+        } else {
+          helpBtn.style.display = 'inline-block';
+        }
+      } catch(e) {
+        truthOrDareResult.style.display = 'flex';
+        truthOrDareMessage.textContent = '⚠️ Ошибка загрузки';
+        helpBtn.style.display = 'none';
+      }
+    });
+
+    helpBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/help');
+        const data = await res.json();
+        truthOrDareMessage.textContent = data.message;
+        helpBtn.style.display = 'none';
+      } catch(e) {
+        truthOrDareMessage.textContent = '⚠️ Ошибка помощи';
+      }
+    });
 
     // --- ОНЛАЙН ---
     const socket = io();
