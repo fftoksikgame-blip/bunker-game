@@ -127,11 +127,17 @@
       box-shadow: 0 8px 30px #00000099;
       cursor: pointer;
       transition: 0.2s;
+      user-select: none;
     }
     .card-item:hover { transform: translateY(-4px); border-color: #ffa500; }
     .card-item .card-title { font-size: 0.6rem; text-transform: uppercase; color: #f5c542; }
     .card-item .card-value { font-size: 1.1rem; font-weight: 600; color: #f0f0f0; }
     .card-item .card-desc { font-size: 0.7rem; color: #8899aa; margin-top: 4px; font-style: italic; }
+    .card-item .card-status { font-size: 0.6rem; color: #667; margin-top: 4px; }
+    .card-item.revealed { border-color: #7aff7a; background: #1a2a1a; }
+    .card-item.revealed .card-status { color: #7aff7a; }
+    .card-item.hidden-card { border-color: #555; opacity: 0.6; }
+    .card-item.hidden-card .card-value { color: #889; }
 
     .info-panels {
       display: flex;
@@ -168,6 +174,11 @@
       font-size: 1.2rem;
       text-align: center;
       border-left: 4px solid #f5c542;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     .player-list {
@@ -343,12 +354,13 @@
   <div id="tab-truth" class="tab-content">
     <div class="card">
       <h2>🎲 Правда или Действие</h2>
-      <p style="color:#aab; margin-bottom:12px;">Нажми «Крутить» — выпадет тип (Правда, Действие или Скип).</p>
+      <p style="color:#aab; margin-bottom:12px;">Нажми «Крутить» — выпадет Правда, Действие или Скип.</p>
       <button class="btn" id="truthMainBtn">🎲 Крутить</button>
+      <button class="btn btn-secondary hidden" id="truthRestartBtn" style="margin-left:10px;">⟳ Начать заново</button>
 
       <div id="truthResult" class="truth-result" style="display:none;">
         <span id="truthMessage"></span>
-        <button class="btn btn-secondary btn-small" id="truthHelpBtn" style="margin-left:10px; display:none;">🤝 Помощь зала</button>
+        <button class="btn btn-secondary btn-small" id="truthHelpBtn" style="display:none;">🤝 Помощь зала</button>
       </div>
     </div>
   </div>
@@ -381,24 +393,96 @@
 
     function renderBunkerCards(cards) {
       bunkerCards.innerHTML = '';
-      cards.forEach(card => {
+      cards.forEach((card, index) => {
         const div = document.createElement('div');
         div.className = 'card-item';
+        if (card.revealed) div.classList.add('revealed');
+        if (card.hidden) div.classList.add('hidden-card');
+        
+        const displayValue = card.hidden ? '🔒 Скрыто' : (card.revealed ? card.value : '❓');
+        const statusText = card.hidden ? '🔒 Скрыта' : (card.revealed ? '✓ Открыта' : '👆 Нажми');
+        
         const descHtml = card.desc ? `<div class="card-desc">${card.desc}</div>` : '';
         div.innerHTML = `
           <div class="card-title">${card.title}</div>
-          <div class="card-value">${card.value}</div>
+          <div class="card-value">${displayValue}</div>
           ${descHtml}
+          <div class="card-status">${statusText}</div>
         `;
+        
+        div.addEventListener('click', () => {
+          if (card.revealed) {
+            // Если открыта — скрываем
+            card.hidden = !card.hidden;
+          } else {
+            // Если скрыта — открываем и записываем в блокнот
+            card.revealed = true;
+            card.hidden = false;
+            if (currentPlayer) {
+              addEntryToPlayer(currentPlayer, card.title, card.value);
+            }
+          }
+          renderBunkerCards(cards);
+          renderNotebook();
+          saveState();
+        });
+        
         bunkerCards.appendChild(div);
       });
     }
+
+    // --- БУНКЕР: данные для блокнота (из предыдущих версий) ---
+    let currentPlayer = '';
+    let allPlayers = [];
+    const STORAGE_KEY = 'portal_data';
+
+    function loadState() {
+      try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return null; const data = JSON.parse(raw); if (data.cards && data.players && data.notebook) return data; return null; } catch { return null; }
+    }
+    function saveState() {
+      const notebook = getNotebook();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ cards: currentCards, players: allPlayers, notebook, currentPlayer }));
+    }
+    function getNotebook() {
+      try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return {}; const data = JSON.parse(raw); return data.notebook || {}; } catch { return {}; }
+    }
+    function saveNotebook(notebook) {
+      const state = loadState() || { cards: [], players: [], notebook: {}, currentPlayer: '' };
+      state.notebook = notebook;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function getPlayerEntries(playerName) {
+      const notebook = getNotebook();
+      return notebook[playerName] || [];
+    }
+    function setPlayerEntries(playerName, entries) {
+      const notebook = getNotebook();
+      notebook[playerName] = entries;
+      saveNotebook(notebook);
+    }
+    function addEntryToPlayer(playerName, title, value) {
+      const entries = getPlayerEntries(playerName);
+      const existing = entries.find(e => e.title === title && e.value === value);
+      if (existing) {
+        existing.count = (existing.count || 1) + 1;
+      } else {
+        entries.push({ title, value, count: 1 });
+      }
+      setPlayerEntries(playerName, entries);
+    }
+    function renderNotebook() {
+      // Заглушка — блокнот уже есть в основном интерфейсе
+    }
+
+    let currentCards = [];
 
     async function fetchBunkerCards() {
       try {
         const res = await fetch('/api/game/bunker');
         const data = await res.json();
-        renderBunkerCards(data);
+        currentCards = data.map(c => ({ ...c, revealed: false, hidden: false }));
+        renderBunkerCards(currentCards);
+        saveState();
       } catch(e) {
         bunkerCards.innerHTML = '<p style="color:#667;">⚠️ Ошибка загрузки</p>';
       }
@@ -431,9 +515,11 @@
 
     document.getElementById('bunkerStartBtn').addEventListener('click', fetchBunkerCards);
     document.getElementById('bunkerRestartBtn').addEventListener('click', () => {
+      currentCards = [];
       bunkerCards.innerHTML = '';
       catastropheContent.innerHTML = '<span class="info-empty">Не выбрана</span>';
       bunkerContent.innerHTML = '<span class="info-empty">Не загружено</span>';
+      saveState();
     });
     document.getElementById('bunkerCatastropheBtn').addEventListener('click', fetchCatastrophe);
     document.getElementById('bunkerContentsBtn').addEventListener('click', fetchBunkerContents);
@@ -442,16 +528,27 @@
     // ПРАВДА ИЛИ ДЕЙСТВИЕ
     // ============================================================
     const truthMainBtn = document.getElementById('truthMainBtn');
+    const truthRestartBtn = document.getElementById('truthRestartBtn');
     const truthResult = document.getElementById('truthResult');
     const truthMessage = document.getElementById('truthMessage');
     const truthHelpBtn = document.getElementById('truthHelpBtn');
+
+    // Сброс состояния Правда/Действие
+    function resetTruth() {
+      truthResult.style.display = 'none';
+      truthHelpBtn.style.display = 'none';
+      truthRestartBtn.classList.add('hidden');
+      truthMainBtn.classList.remove('hidden');
+    }
 
     truthMainBtn.addEventListener('click', async () => {
       try {
         const res = await fetch('/api/truthordare');
         const data = await res.json();
-        truthResult.style.display = 'block';
+        truthResult.style.display = 'flex';
         truthMessage.textContent = data.message;
+        truthRestartBtn.classList.remove('hidden');
+        truthMainBtn.classList.add('hidden');
         
         if (data.type === 'skip') {
           truthHelpBtn.style.display = 'none';
@@ -460,11 +557,15 @@
           truthHelpBtn.dataset.type = data.type;
         }
       } catch(e) {
-        truthResult.style.display = 'block';
+        truthResult.style.display = 'flex';
         truthMessage.textContent = '⚠️ Ошибка загрузки';
         truthHelpBtn.style.display = 'none';
+        truthRestartBtn.classList.remove('hidden');
+        truthMainBtn.classList.add('hidden');
       }
     });
+
+    truthRestartBtn.addEventListener('click', resetTruth);
 
     truthHelpBtn.addEventListener('click', async () => {
       try {
@@ -479,7 +580,7 @@
     });
 
     // ============================================================
-    // МАФИЯ
+    // МАФИЯ (упрощённо, без изменений)
     // ============================================================
     const mafiaSocket = io();
 
@@ -656,7 +757,7 @@
     document.getElementById('mafiaLeaveGameBtn').addEventListener('click', mafiaLeave);
 
     // ============================================================
-    // ШПИОН
+    // ШПИОН (упрощённо, без изменений)
     // ============================================================
     const spySocket = io();
 
@@ -800,6 +901,12 @@
     // ============================================================
     // ЗАПУСК БУНКЕРА
     // ============================================================
+    // Восстановление состояния игроков для блокнота
+    const saved = loadState();
+    if (saved && saved.players) {
+      allPlayers = saved.players;
+      currentPlayer = saved.currentPlayer || (allPlayers.length > 0 ? allPlayers[0] : '');
+    }
     fetchBunkerCards();
   })();
 </script>
